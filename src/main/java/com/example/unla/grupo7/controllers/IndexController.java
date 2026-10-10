@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.unla.grupo7.helper.ViewRouteHelper;
+
 @Controller 
 @RequestMapping ("/hola")
 public class IndexController {
