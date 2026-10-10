@@ -6,30 +6,35 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 @Data 
+@Entity 
 public class DetallePedido {
-    @Id 
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private long idDetallePedido;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idDetallePedido;
 
     private int cantidad;
 
-    @ManyToMany (fetch = FetchType.LAZY, mappedBy = "detallePedido")
-    private Set<Pedido> pedidos;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pedido_id", nullable = false)
+    private Pedido pedido;
 
-    @ManyToMany (fetch = FetchType.LAZY, mappedBy = "detallePedido")
-    private Set<Plato> platos;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "plato_id", nullable = false)
+    private Plato plato;
 
     @CreationTimestamp
-	private LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
-	@UpdateTimestamp
-	private LocalDateTime updatedAt;
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

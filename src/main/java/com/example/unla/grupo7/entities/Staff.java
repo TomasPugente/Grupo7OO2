@@ -3,6 +3,7 @@ package com.example.unla.grupo7.entities;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,10 +13,11 @@ import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 @Data 
+@Entity 
 public class Staff {
     @Id 
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    protected long id;
+    private long id;
 
     private String nombre;
 
