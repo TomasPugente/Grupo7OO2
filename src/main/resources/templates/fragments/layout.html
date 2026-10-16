@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo} + ' | Epicentro Gourmet'">Epicentro Gourmet</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<!-- rol: 'publico' | 'admin' | 'responsable' | 'empleado' -->
+<nav class="navbar" th:fragment="navbar(rol)">
+    <a class="marca" th:href="@{/}">Epicentro Gourmet</a>
+    <th:block th:if="${rol == 'publico'}">
+        <a th:href="@{/registro}">Registrar unidad</a>
+        <a th:href="@{/login}">Iniciar sesión</a>
+    </th:block>
+    <th:block th:if="${rol == 'admin'}">
+        <a th:href="@{/admin/festivales}">Festivales</a>
+        <a th:href="@{/admin/ranking}">Ranking</a>
+        <a th:href="@{/admin/mayor-canon}">Mayor canon</a>
+    </th:block>
+    <th:block th:if="${rol == 'responsable'}">
+        <a th:href="@{/responsable/empleados}">Empleados</a>
+        <a th:href="@{/responsable/platos}">Platos</a>
+        <a th:href="@{/responsable/reportes}">Reportes</a>
+    </th:block>
+    <th:block th:if="${rol == 'empleado'}">
+        <a th:href="@{/empleado/mi-informacion}">Mi información</a>
+        <a th:href="@{/empleado/sueldos}">Sueldos</a>
+        <a th:href="@{/empleado/festival-actual}">Festival actual</a>
+    </th:block>
+    <a th:if="${rol != 'publico'}" th:href="@{/logout}">Cerrar sesión</a>
+</nav>
+<footer th:fragment="pie">Epicentro Gourmet · Orientación a Objetos II</footer>
+</body>
+</html>

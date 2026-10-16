@@ -14,13 +14,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
 
-@Data 
-@Entity 
+@Data @Entity 
 public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,4 +38,5 @@ public class Pedido {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
 }
