@@ -1,0 +1,62 @@
+/* Hoja de estilos general - Epicentro Gourmet */
+:root{
+  --tinta:#1f2a30; --primario:#0f4c5c; --primario-osc:#0a3541;
+  --acento:#e09f3e; --fondo:#f5f6f4; --panel:#ffffff;
+  --borde:#d9ddd9; --texto-suave:#5b676d; --error:#b3261e; --ok:#2e7d4f;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fondo);color:var(--tinta);line-height:1.5}
+a{color:var(--primario)}
+h1{font-size:1.7rem;margin:0 0 .25rem}
+h2{font-size:1.2rem;margin:0 0 .75rem}
+.subtitulo{color:var(--texto-suave);margin:0 0 1.5rem}
+
+/* Barra de navegación */
+.navbar{background:var(--primario);display:flex;align-items:center;gap:1.25rem;padding:.75rem 1.5rem;flex-wrap:wrap}
+.navbar .marca{color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;margin-right:auto}
+.navbar a{color:#e6eef0;text-decoration:none;font-size:.95rem;padding:.25rem 0;border-bottom:2px solid transparent}
+.navbar a:hover,.navbar a.activo{border-bottom-color:var(--acento);color:#fff}
+
+/* Estructura */
+.contenedor{max-width:1000px;margin:2rem auto;padding:0 1rem}
+.contenedor.angosto{max-width:480px}
+.panel{background:var(--panel);border:1px solid var(--borde);border-radius:6px;padding:1.5rem;margin-bottom:1.5rem}
+.fila{display:flex;gap:1rem;flex-wrap:wrap}
+.fila>*{flex:1 1 200px}
+footer{text-align:center;color:var(--texto-suave);font-size:.85rem;padding:2rem 1rem}
+
+/* Formularios */
+label{display:block;font-weight:600;margin:0 0 .25rem;font-size:.9rem}
+input,select{width:100%;padding:.55rem .65rem;border:1px solid var(--borde);border-radius:4px;font:inherit;background:#fff;margin-bottom:1rem}
+input:focus,select:focus,.btn:focus-visible,a:focus-visible{outline:2px solid var(--acento);outline-offset:1px}
+fieldset{border:1px solid var(--borde);border-radius:6px;margin:0 0 1rem;padding:1rem 1rem 0}
+legend{font-weight:600;padding:0 .4rem}
+.ayuda{color:var(--texto-suave);font-size:.8rem;margin:-.75rem 0 1rem}
+
+/* Botones */
+.btn{display:inline-block;background:var(--primario);color:#fff;border:0;border-radius:4px;padding:.55rem 1.1rem;font:inherit;font-weight:600;text-decoration:none;cursor:pointer}
+.btn:hover{background:var(--primario-osc)}
+.btn.secundario{background:#fff;color:var(--primario);border:1px solid var(--primario)}
+.btn.secundario:hover{background:#eef3f4}
+.btn.peligro{background:var(--error)}
+.btn.chico{padding:.25rem .65rem;font-size:.85rem}
+.acciones{display:flex;gap:.5rem;flex-wrap:wrap}
+
+/* Tablas */
+.tabla-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{text-align:left;padding:.6rem .75rem;border-bottom:1px solid var(--borde)}
+th{background:#eef1ee;font-weight:600}
+td.num,th.num{text-align:right}
+tr:hover td{background:#fafbfa}
+
+/* Mensajes y datos */
+.alerta{padding:.75rem 1rem;border-radius:4px;margin-bottom:1rem;border:1px solid}
+.alerta.error{color:var(--error);border-color:var(--error);background:#fdecea}
+.alerta.ok{color:var(--ok);border-color:var(--ok);background:#e8f5ec}
+.dato{border-left:4px solid var(--acento);padding:.25rem 0 .25rem .85rem;margin-bottom:1rem}
+.dato small{display:block;color:var(--texto-suave)}
+.dato strong{font-size:1.4rem}
+.etiqueta{display:inline-block;background:#eef1ee;border-radius:3px;padding:.1rem .5rem;font-size:.8rem}
+.centrado{text-align:center}
+@media (max-width:600px){.navbar{gap:.75rem}}

@@ -1,12 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio</title>
-</head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Inicio')}"></head>
 <body>
-    <h1>Hola</h1>
-    <p> a todos</p>
+<nav th:replace="~{fragments/layout :: navbar('publico')}"></nav>
+<main class="contenedor">
+<h1>Festivales</h1>
+<p class="subtitulo">Festivales gastronómicos del predio.</p>
+<div class="panel tabla-wrap">
+<table>
+<thead><tr><th>Nombre</th><th>Temporada</th><th>Inicio</th><th>Fin</th></tr></thead>
+<tbody>
+<tr th:each="festival : ${festivales}">
+    <td ><span th:text="${festival.nombre}"></span></td>
+    <td ><span th:text="${festival.temporada}"></span></td>
+    <td ><span th:text="${festival.fechaInicio}"></span></td>
+    <td ><span th:text="${festival.fechaFin}"></span></td>
+</tr>
+</tbody></table></div>
+<div class="acciones">
+<a class="btn" th:href="@{/registro}">Registrar unidad de venta</a>
+<a class="btn secundario" th:href="@{/login}">Iniciar sesión</a>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: pie}"></footer>
 </body>
 </html>
