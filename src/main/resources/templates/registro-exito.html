@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Unidad registrada')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('admin')}"></nav>
+<main class="contenedor">
+<div class="contenedor angosto" style="margin-top:0">
+  <h1>Unidad registrada</h1>
+
+  <div th:if="${credenciales == null}" class="alerta error">
+    No hay credenciales que mostrar. Volvé al <a th:href="@{/registro}">formulario</a>.
+  </div>
+
+  <div th:if="${credenciales != null}">
+    <p class="subtitulo">
+      Se creó la unidad <strong th:text="${credenciales.nombreComercial}"></strong>.
+      Entregá estas credenciales al responsable (solo se muestran una vez).
+    </p>
+    <div class="panel">
+      <p><strong>Usuario:</strong> <span th:text="${credenciales.usuario}"></span></p>
+      <p><strong>Contraseña:</strong> <code th:text="${credenciales.passwordEnClaro}"></code></p>
+    </div>
+    <div class="acciones">
+      <a class="btn" th:href="@{/registro}">Registrar otra unidad</a>
+      <a class="btn secundario" th:href="@{/index}">Volver al inicio</a>
+    </div>
+  </div>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+</body>
+</html>
