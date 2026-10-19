@@ -10,5 +10,5 @@ import lombok.EqualsAndHashCode;
 public class FoodTruck extends UnidadDeVenta{
     private String patente;
 
-    private boolean usaElectricidad;
+    private boolean requiereElectricidad;
 }

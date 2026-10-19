@@ -2,52 +2,65 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Registro de unidad')}"></head>
 <body>
-<nav th:replace="~{fragments/layout :: navbar('publico')}"></nav>
+<nav th:replace="~{fragments/layout :: navbar('admin')}"></nav>
 <main class="contenedor">
 <h1>Registrar unidad de venta</h1>
-<p class="subtitulo">Cargá los datos de la unidad y de su responsable.</p>
-<form method="post" th:action="@{/registro}">
+<p class="subtitulo">Cargá los datos de la unidad y de su responsable. El sistema generará una contraseña aleatoria.</p>
+
+<div class="alerta error" th:if="${error != null}" th:text="${error}"></div>
+
+<form method="post" th:action="@{/registro}" th:object="${registro}">
 <fieldset>
   <legend>Datos del responsable</legend>
   <div class="fila">
-    <div><label for="nombre">Nombre</label><input id="nombre" name="nombre" required></div>
-    <div><label for="apellido">Apellido</label><input id="apellido" name="apellido" required></div>
+    <div><label for="nombre">Nombre</label><input id="nombre" th:field="*{nombre}" required></div>
+    <div><label for="apellido">Apellido</label><input id="apellido" th:field="*{apellido}" required></div>
   </div>
   <div class="fila">
-    <div><label for="dni">DNI</label><input id="dni" name="dni" required></div>
-    <div><label for="nac">Fecha de nacimiento</label><input id="nac" name="fechaNacimiento" type="date" required></div>
-    <div><label for="ingreso">Fecha de ingreso</label><input id="ingreso" name="fechaIngreso" type="date" required></div>
+    <div><label for="dni">DNI</label><input id="dni" th:field="*{dni}" type="number" required></div>
+    <div><label for="nac">Fecha de nacimiento</label><input id="nac" th:field="*{fechaNacimiento}" type="date" required></div>
+    <div><label for="ingreso">Fecha de ingreso</label><input id="ingreso" th:field="*{fechaIngreso}" type="date" required></div>
   </div>
   <div class="fila">
-    <div><label for="user">Usuario</label><input id="user" name="usuario" required></div>
-    <div><label for="pass">Contraseña</label><input id="pass" name="password" type="password" required></div>
+    <div><label for="user">Usuario</label><input id="user" th:field="*{usuario}" minlength="3" maxlength="45" required></div>
+    <div><label for="email">Email (opcional)</label><input id="email" th:field="*{email}" type="email"></div>
   </div>
 </fieldset>
 <fieldset>
   <legend>Datos de la unidad</legend>
   <div class="fila">
-    <div><label for="comercial">Nombre comercial</label><input id="comercial" name="nombreComercial" required></div>
-    <div><label for="codigo">Código (10 caracteres)</label><input id="codigo" name="codigo" maxlength="10" minlength="10" required></div>
-    <div><label for="sup">Superficie (m²)</label><input id="sup" name="superficie" type="number" min="1" step="0.1" required></div>
+    <div><label for="comercial">Nombre comercial</label><input id="comercial" th:field="*{nombreComercial}" required></div>
+    <div><label for="codigo">Código (10 caracteres)</label><input id="codigo" th:field="*{codigo}" maxlength="10" minlength="10" required></div>
+    <div><label for="sup">Superficie (m²)</label><input id="sup" th:field="*{superficie}" type="number" min="1" step="0.1" required></div>
   </div>
   <div class="fila">
     <div><label for="festival">Festival</label>
-      <select id="festival" name="festivalId"><option>Festival del Chocolate</option><option>Feria de Sabores del Mar</option></select></div>
+      <select id="festival" th:field="*{festivalId}" required>
+        <option value="" disabled>Elegí un festival</option>
+        <option th:each="f : ${festivales}" th:value="${f.idFestival}" th:text="${f.nombre}"></option>
+      </select></div>
     <div><label for="tipo">Tipo de unidad</label>
-      <select id="tipo" name="tipo"><option value="FOOD_TRUCK">Food Truck</option><option value="PUESTO">Puesto desarmable</option></select></div>
+      <select id="tipo" th:field="*{tipo}" required>
+        <option value="FOOD_TRUCK">Food Truck</option>
+        <option value="PUESTO">Puesto desarmable</option>
+      </select></div>
   </div>
   <p class="ayuda">Completá solo los campos del tipo elegido.</p>
   <div class="fila">
-    <div><label for="patente">Patente (Food Truck)</label><input id="patente" name="patente"></div>
+    <div><label for="patente">Patente (Food Truck)</label><input id="patente" th:field="*{patente}"></div>
     <div><label for="elec">Requiere electricidad</label>
-      <select id="elec" name="requiereElectricidad"><option value="true">Sí</option><option value="false">No</option></select></div>
-    <div><label for="carpas">Cantidad de carpas (Puesto)</label><input id="carpas" name="cantidadCarpas" type="number" min="1"></div>
-    <div><label for="montaje">Tiempo de montaje en minutos (Puesto)</label><input id="montaje" name="tiempoMontaje" type="number" min="0"></div>
+      <select id="elec" th:field="*{requiereElectricidad}">
+        <option value="">—</option>
+        <option value="true">Sí</option>
+        <option value="false">No</option>
+      </select></div>
+    <div><label for="carpas">Cantidad de carpas (Puesto)</label><input id="carpas" th:field="*{cantidadCarpas}" type="number" min="1"></div>
+    <div><label for="montaje">Tiempo de montaje en minutos (Puesto)</label><input id="montaje" th:field="*{tiempoMontaje}" type="number" min="0"></div>
   </div>
 </fieldset>
 <div class="acciones">
   <button class="btn" type="submit">Registrar unidad</button>
-  <a class="btn secundario" th:href="@{/}">Cancelar</a>
+  <a class="btn secundario" th:href="@{/index}">Cancelar</a>
 </div>
 </form>
 </main>

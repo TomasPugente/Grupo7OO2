@@ -15,10 +15,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
 
-@Data 
-@Entity 
+@Data
+@Entity
 public class Responsable {
-    @Id 
+    @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private long idResponsable;
 
@@ -27,12 +27,18 @@ public class Responsable {
     private String apellido;
 
     private int dni;
-    
+
     private LocalDate fechaNacimiento;
+
+    private LocalDate fechaIngreso;
 
     @OneToOne (fetch = FetchType.LAZY)
     @JoinColumn (name="unidadDeVentaId", nullable = true)
     private UnidadDeVenta unidadDeVenta;
+
+    @OneToOne (fetch = FetchType.LAZY)
+    @JoinColumn (name="userId", nullable = true, unique = true)
+    private User user;
 
     @CreationTimestamp
 	private LocalDateTime createdAt;

@@ -28,7 +28,7 @@ public class UnidadDeVenta {
 
     protected double superficie;
 
-    protected int codigo;
+    protected String codigo;
 
     protected boolean activo;
 
