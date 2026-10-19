@@ -1,11 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Unidades de venta')}"></head>
+
 <body>
-    
+
+    <nav th:replace="~{fragments/layout :: navbar('publico')}"></nav>
+
+    <main class="contenedor">
+
+        <h1>Unidades de venta</h1>
+
+        <p class="subtitulo">
+            Unidades de venta registradas para el festival seleccionado.
+        </p>
+
+        <section class="panel">
+
+            <h2>
+                Festival:
+                <span th:text="${festival.nombre}">Nombre del festival</span>
+            </h2>
+
+        </section>
+
+        <section class="panel">
+
+            
+        <div class="fila-ordenamiento">
+            <h2>Listado de unidades</h2>
+
+            <div class="acciones">
+
+                <a class="btn secundario"
+                    th:href="@{/festivales/{id}/unidades(id=${idFestival}, orden=${siguienteOrden})}"
+                    th:text="${textoBoton}">
+                </a>
+
+                <a class="btn secundario"
+                    th:if="${mostrarRestablecer}"
+                    th:href="@{/festivales/{id}/unidades(id=${idFestival}, orden='original')}">
+                    Restablecer orden original
+                </a>
+
+            </div>
+        </div>
+
+
+            <div class="tabla-wrap">
+
+                <table th:if="${not #lists.isEmpty(unidades)}">
+
+                    <thead>
+                        <tr>
+                            <th>Nombre comercial</th>
+                            <th>Código</th>
+                            <th class="num">Superficie</th>
+                            <th class="num">Recaudación</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="unidad : ${unidades}">
+                            <td th:text="${unidad.nombreComercial}"></td>
+                            <td th:text="${unidad.codigo}"></td>
+
+                            <td class="num"
+                                th:text="${unidad.superficie}">
+                            </td>
+
+                            <td class="num"
+                                th:text="${#numbers.formatDecimal(unidad.recaudacion, 1, 'POINT', 2, 'COMMA')}">
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <p class="alerta"
+               th:if="${#lists.isEmpty(unidades)}">
+                Este festival todavía no tiene unidades de venta registradas.
+            </p>
+
+        </section>
+
+        <div class="acciones">
+
+            <a class="btn secundario" th:href="@{/index}">
+                Volver a festivales
+            </a>
+
+            <a class="btn" th:href="@{/registro}">
+                Registrar unidad de venta
+            </a>
+
+        </div>
+
+    </main>
+
+    <footer th:replace="~{fragments/layout :: pie}"></footer>
+
 </body>
 </html>
