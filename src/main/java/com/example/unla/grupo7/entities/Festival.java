@@ -17,7 +17,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
 
-@Entity 
+@Data @Entity 
 public class Festival {
     @Id 
     @GeneratedValue (strategy = GenerationType.IDENTITY)
@@ -45,19 +45,4 @@ public class Festival {
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 
-    public String getNombre (){
-        return nombre;
-    }
-
-    public String getTemporada (){
-        return temporada;
-    }
-    
-    public LocalDate getFechaInicio (){
-        return fechaInicio;
-    }
-    
-    public LocalDate getFechaFin (){
-        return fechaFin;
-    }
 }
