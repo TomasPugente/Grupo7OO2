@@ -19,7 +19,7 @@ import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/registro")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 public class RegistroController {
 
     private final IRegistroService registroService;

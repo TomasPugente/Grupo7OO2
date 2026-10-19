@@ -25,6 +25,23 @@ h2{font-size:1.2rem;margin:0 0 .75rem}
 .fila>*{flex:1 1 200px}
 footer{text-align:center;color:var(--texto-suave);font-size:.85rem;padding:2rem 1rem}
 
+
+/* Encabezado del listado y botón de ordenamiento */
+.fila-ordenamiento {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.fila-ordenamiento h2 {
+    margin: 0;
+}
+
+
+
 /* Formularios */
 label{display:block;font-weight:600;margin:0 0 .25rem;font-size:.9rem}
 input,select{width:100%;padding:.55rem .65rem;border:1px solid var(--borde);border-radius:4px;font:inherit;background:#fff;margin-bottom:1rem}

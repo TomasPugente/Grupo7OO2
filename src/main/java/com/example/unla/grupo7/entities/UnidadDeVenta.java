@@ -32,6 +32,8 @@ public class UnidadDeVenta {
 
     protected boolean activo;
 
+    protected double recaudacion;
+
     @ManyToOne (fetch= FetchType.LAZY)
     @JoinColumn (name="festivalId")
     protected Festival festival;

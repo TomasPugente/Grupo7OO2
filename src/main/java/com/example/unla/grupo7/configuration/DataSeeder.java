@@ -47,7 +47,7 @@ public class DataSeeder implements CommandLineRunner {
 
         UserRole rol = new UserRole();
         rol.setUser(admin);
-        rol.setRole("ADMIN");
+        rol.setRole("ADMINISTRADOR");
         admin.getUserRoles().add(rol);
         userRepository.save(admin);
 
