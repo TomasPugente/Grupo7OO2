@@ -24,4 +24,6 @@ public interface IUnidadDeVentaRepository
     // Orden por recaudación: de mayor a menor
     List<UnidadDeVenta> findByFestival_IdFestivalOrderByRecaudacionDesc(
             Long idFestival);
+
+    List<UnidadDeVenta> findByFestival_IdFestival(Long idFestival);
 }

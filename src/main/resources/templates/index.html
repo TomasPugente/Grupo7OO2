@@ -65,7 +65,11 @@
     <div class="acciones">
         <a class="btn"
             th:if="${esAdmin}"
-            th:href="@{/registro}">
+            th:href="@{/festivales/reporte-mayores-canon}">
+            Unidades con mayor canon
+        </a>
+        
+        <a class="btn" th:href="@{/registro}">
             Registrar unidad de venta
         </a>
 
