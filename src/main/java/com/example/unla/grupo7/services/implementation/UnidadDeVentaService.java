@@ -30,7 +30,7 @@ public class UnidadDeVentaService {
 
             FoodTruck foodTruck = (FoodTruck) unidad;
 
-            if (foodTruck.isUsaElectricidad()) {
+            if (foodTruck.isRequiereElectricidad()) {
                 canon += 2000;
             }
 

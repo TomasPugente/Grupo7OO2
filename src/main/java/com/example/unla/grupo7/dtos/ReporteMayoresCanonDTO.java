@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class ReporteMayoresCanonDTO {
 
     private String nombreComercial;
-    private int codigo;
+    private String codigo;
     private String tipoUnidad;
     private double canon;
 }
