@@ -1,4 +1,3 @@
-
 package com.example.unla.grupo7.configuration;
 
 import org.springframework.context.annotation.Bean;
@@ -46,6 +45,7 @@ public class SecurityConfiguration {
         http
             .authenticationProvider(authenticationProvider)
 
+            
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/",
@@ -56,6 +56,9 @@ public class SecurityConfiguration {
                     "/images/**",
                     "/webjars/**"
                 ).permitAll()
+
+                .requestMatchers("/festivales/*/unidades").hasRole("ADMINISTRADOR")
+
                 .anyRequest().authenticated()
             )
 
