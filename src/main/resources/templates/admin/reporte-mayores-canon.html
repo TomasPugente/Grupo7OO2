@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Unidades con mayor canon')}"></head>
+
+<body>
+
+    <nav th:replace="~{fragments/layout :: navbar('publico')}"></nav>
+
+    <main class="contenedor">
+
+        <h1>Unidades con mayor canon</h1>
+
+        <p class="subtitulo">
+            Consultá las unidades de venta que deben pagar el mayor canon
+            para un festival.
+        </p>
+
+        <section class="panel">
+
+            <h2>Parámetros del reporte</h2>
+
+            <form th:action="@{/festivales/reporte-mayores-canon}" method="get">
+
+                <label for="idFestival">Festival</label>
+
+                <select id="idFestival" name="idFestival" required>
+                    <option value="">Seleccioná un festival</option>
+
+                    <option th:each="f : ${festivales}"
+                            th:value="${f.idFestival}"
+                            th:text="${f.nombre}"
+                            th:selected="${idFestival != null and idFestival.equals(f.idFestival)}">
+                    </option>
+                </select>
+
+                <label for="x">Cantidad de unidades</label>
+
+                <input type="number"
+                       id="x"
+                       name="x"
+                       min="1"
+                       max="100"
+                       th:value="${x}"
+                       required>
+
+                <button type="submit" class="btn">
+                    Generar reporte
+                </button>
+
+            </form>
+
+        </section>
+
+        <section class="panel" th:if="${busquedaRealizada}">
+
+            <h2>
+                Festival:
+                <span th:text="${festival.nombre}"></span>
+            </h2>
+
+            <div class="tabla-wrap">
+
+                <table th:if="${not #lists.isEmpty(reporte)}">
+
+                    <thead>
+                        <tr>
+                            <th>Nombre comercial</th>
+                            <th>Código</th>
+                            <th>Tipo de unidad</th>
+                            <th class="num">Canon</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="unidad : ${reporte}">
+                            <td th:text="${unidad.nombreComercial}"></td>
+                            <td th:text="${unidad.codigo}"></td>
+                            <td th:text="${unidad.tipoUnidad}"></td>
+                            <td class="num"
+                                th:text="${#numbers.formatDecimal(unidad.canon, 1, 'POINT', 2, 'COMMA')}">
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <p class="alerta"
+               th:if="${#lists.isEmpty(reporte)}">
+                No hay unidades de venta para mostrar en este reporte.
+            </p>
+
+        </section>
+
+        <div class="acciones">
+            <a class="btn secundario" th:href="@{/index}">
+                Volver al inicio
+            </a>
+        </div>
+
+    </main>
+
+    <footer th:replace="~{fragments/layout :: pie}"></footer>
+
+</body>
+</html>
