@@ -57,7 +57,10 @@ public class SecurityConfiguration {
                     "/webjars/**"
                 ).permitAll()
 
-                .requestMatchers("/festivales/*/unidades").hasRole("ADMINISTRADOR")
+                .requestMatchers(
+                    "/festivales/*/unidades",
+                    "/festivales/reporte-mayores-canon"
+                ).hasRole("ADMINISTRADOR")
 
                 .anyRequest().authenticated()
             )
