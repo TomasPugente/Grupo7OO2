@@ -7,7 +7,12 @@
 <div class="contenedor angosto" style="margin-top:0">
 <h1>Iniciar sesión</h1>
 <p class="subtitulo">Ingresá con tu usuario y contraseña.</p>
-<div class="alerta error">Usuario o contraseña incorrectos.</div>
+<div class="alerta error" th:if="${error != null}">
+    Usuario o contraseña incorrectos.
+</div>
+<div class="alerta" th:if="${logout != null}">
+    Cerraste sesión correctamente.
+</div>
 <form class="panel" method="post" th:action="@{/login}">
   <label for="usuario">Usuario</label>
   <input id="usuario" name="username" type="text" required>
