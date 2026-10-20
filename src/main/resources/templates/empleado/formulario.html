@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Formulario de empleado')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('publico')}"></nav>
+
+<main class="panel">
+    <h1 th:text="${idEmpleado != null
+        ? 'Modificar empleado'
+        : 'Registrar empleado'}">
+    </h1>
+
+    <p th:if="${error}" th:text="${error}"></p>
+
+    <p th:if="${idEmpleado == null}">
+        Se generará una contraseña automáticamente y se enviará
+        al email ingresado.
+    </p>
+
+    <form th:object="${staffForm}"
+          th:action="${idEmpleado != null}
+              ? @{/empleados/{id}/editar(id=${idEmpleado})}
+              : @{/empleados}"
+          method="post">
+
+        <div>
+            <label for="nombre">Nombre</label>
+            <input id="nombre" type="text" th:field="*{nombre}" required>
+            <p th:if="${#fields.hasErrors('nombre')}"
+               th:errors="*{nombre}"></p>
+        </div>
+
+        <div>
+            <label for="apellido">Apellido</label>
+            <input id="apellido" type="text" th:field="*{apellido}" required>
+            <p th:if="${#fields.hasErrors('apellido')}"
+               th:errors="*{apellido}"></p>
+        </div>
+
+        <div>
+            <label for="dni">DNI</label>
+            <input id="dni" type="number" th:field="*{dni}" min="1" required>
+            <p th:if="${#fields.hasErrors('dni')}"
+               th:errors="*{dni}"></p>
+        </div>
+
+        <div>
+            <label for="fechaNacimiento">Fecha de nacimiento</label>
+            <input id="fechaNacimiento" type="date"
+                   th:field="*{fechaNacimiento}" required>
+            <p th:if="${#fields.hasErrors('fechaNacimiento')}"
+               th:errors="*{fechaNacimiento}"></p>
+        </div>
+
+        <div>
+            <label for="fechaIngreso">Fecha de ingreso</label>
+            <input id="fechaIngreso" type="date"
+                   th:field="*{fechaIngreso}" required>
+            <p th:if="${#fields.hasErrors('fechaIngreso')}"
+               th:errors="*{fechaIngreso}"></p>
+        </div>
+
+        <div>
+            <label for="sueldo">Sueldo</label>
+            <input id="sueldo" type="number" step="0.01"
+                   th:field="*{sueldo}" min="0.01" required>
+            <p th:if="${#fields.hasErrors('sueldo')}"
+               th:errors="*{sueldo}"></p>
+        </div>
+
+        <div>
+            <label for="email">Email (usuario de acceso)</label>
+            <input id="email" type="email" th:field="*{email}" required>
+            <p th:if="${#fields.hasErrors('email')}"
+               th:errors="*{email}"></p>
+        </div>
+
+        <div>
+            <label for="unidadDeVentaId">Unidad de venta</label>
+            <select id="unidadDeVentaId" th:field="*{unidadDeVentaId}">
+                <option value="">Sin asignar</option>
+                <option th:each="unidad : ${unidades}"
+                        th:value="${unidad.idUnidadDeVenta}"
+                        th:text="${unidad.nombreComercial}">
+                </option>
+            </select>
+        </div>
+
+        <div class="acciones">
+            <button class="btn" type="submit">Guardar</button>
+            <a class="btn secundario" th:href="@{/empleados}">Cancelar</a>
+        </div>
+    </form>
+</main>
+
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+</body>
+</html>

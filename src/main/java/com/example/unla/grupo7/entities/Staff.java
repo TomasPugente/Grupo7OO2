@@ -9,33 +9,33 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.ManyToOne;
+
 import lombok.Data;
 
-@Data 
-@Entity 
+@Data
+@Entity
 public class Staff {
-    @Id 
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String nombre;
-
     private String apellido;
-
     private int dni;
-
     private LocalDate fechaNacimiento;
-
     private LocalDate fechaIngreso;
-
     private BigDecimal sueldo;
-
     private String email;
-
     private boolean activo;
 
-    @ManyToOne (fetch= FetchType.LAZY)
-    @JoinColumn (name="unidadDeVentaId", nullable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unidadDeVentaId", nullable = true)
     private UnidadDeVenta unidadDeVenta;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
 }
