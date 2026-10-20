@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Error del servidor')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('publico')}"></nav>
+<main class="contenedor">
+<div class="panel error-pagina">
+  <p class="error-codigo">500</p>
+  <h1>Tuvimos un problema</h1>
+  <p class="subtitulo">Ocurrió un error en el servidor. Probá de nuevo en unos minutos.</p>
+  <div class="acciones" style="justify-content:center">
+    <a class="btn" th:href="@{/}">Volver al inicio</a>
+  </div>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+</body>
+</html>

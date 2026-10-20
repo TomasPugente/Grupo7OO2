@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="~{fragments/layout :: head('Inicio')}"></head>
 
@@ -75,13 +77,25 @@
             Gestión de platos
         </a>
         
-        <a class="btn" th:href="@{/registro}">
+        
+        <a class="btn" 
+            th:if="${esAdmin}"
+            th:href="@{/registro}">
             Registrar unidad de venta
         </a>
 
-        <a class="btn secundario" th:href="@{/login}">
-            Iniciar sesión
-        </a>
+<a class="btn secundario"
+   sec:authorize="isAnonymous()"
+   th:href="@{/login}">
+    Iniciar sesión
+</a>
+
+<a sec:authorize="isAuthenticated()"
+      th:href="@{/logout}"
+      method="post"
+      class="btn secundario">
+    Cerrar sesión
+</a>
     </div>
 
 </main>
