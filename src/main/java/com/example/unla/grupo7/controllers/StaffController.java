@@ -5,8 +5,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.unla.grupo7.dtos.StaffDTO;
 import com.example.unla.grupo7.dtos.StaffFormDTO;
 import com.example.unla.grupo7.entities.Staff;
 import com.example.unla.grupo7.repositories.IUnidadDeVentaRepository;
@@ -30,22 +32,24 @@ public class StaffController {
     }
 
     @GetMapping
-    public String listar(Model model) {
-        model.addAttribute("empleados", staffService.listarActivos());
-        return "empleados/lista";
+    public ModelAndView listar() {
+        ModelAndView mAV= new ModelAndView("empleado/lista");
+        mAV.addObject("empleados", staffService.listarActivos());
+        mAV.addObject("empleado", new StaffDTO());
+        return mAV;
     }
 
     @GetMapping("/inactivos")
     public String listarInactivos(Model model) {
         model.addAttribute("empleados", staffService.listarInactivos());
-        return "empleados/inactivos";
+        return "empleado/inactivos";
     }
 
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
         model.addAttribute("staffForm", new StaffFormDTO());
         cargarUnidades(model);
-        return "empleados/formulario";
+        return "empleado/formulario";
     }
 
     @PostMapping
@@ -57,7 +61,7 @@ public class StaffController {
 
         if (result.hasErrors()) {
             cargarUnidades(model);
-            return "empleados/formulario";
+            return "empleado/formulario";
         }
 
         try {
@@ -66,12 +70,12 @@ public class StaffController {
                 "mensaje",
                 "Empleado creado. Se enviaron las credenciales por correo."
             );
-            return "redirect:/empleados";
+            return "redirect:/empleado";
 
         } catch (IllegalArgumentException ex) {
             model.addAttribute("error", ex.getMessage());
             cargarUnidades(model);
-            return "empleados/formulario";
+            return "empleado/formulario";
         }
     }
 
@@ -99,7 +103,7 @@ public class StaffController {
         model.addAttribute("idEmpleado", id);
         cargarUnidades(model);
 
-        return "empleados/formulario";
+        return "empleado/formulario";
     }
 
     @PostMapping("/{id}/editar")
@@ -113,7 +117,7 @@ public class StaffController {
         if (result.hasErrors()) {
             model.addAttribute("idEmpleado", id);
             cargarUnidades(model);
-            return "empleados/formulario";
+            return "empleado/formulario";
         }
 
         try {
@@ -121,13 +125,13 @@ public class StaffController {
             redirectAttrs.addFlashAttribute(
                 "mensaje", "Empleado modificado correctamente."
             );
-            return "redirect:/empleados";
+            return "redirect:/empleado";
 
         } catch (IllegalArgumentException ex) {
             model.addAttribute("idEmpleado", id);
             model.addAttribute("error", ex.getMessage());
             cargarUnidades(model);
-            return "empleados/formulario";
+            return "empleado/formulario";
         }
     }
 
@@ -142,7 +146,7 @@ public class StaffController {
             "mensaje", "Empleado dado de baja correctamente."
         );
 
-        return "redirect:/empleados";
+        return "redirect:/empleado";
     }
 
     @PostMapping("/{id}/reactivar")
@@ -156,7 +160,7 @@ public class StaffController {
             "mensaje", "Empleado reactivado correctamente."
         );
 
-        return "redirect:/empleados/inactivos";
+        return "redirect:/empleado/inactivos";
     }
 
     private void cargarUnidades(Model model) {
