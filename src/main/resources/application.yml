@@ -4,8 +4,8 @@ spring:
 
   datasource:
     url: jdbc:mysql://localhost:3306/festival_gourmet
-    username: ${USUARIO_BASE_DATOS}
-    password: ${CONTRASENA_BASE_DATOS}
+    username: root
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:

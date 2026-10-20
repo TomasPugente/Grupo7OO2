@@ -1,11 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Platos')}"></head>
 <body>
-  
+<nav th:replace="~{fragments/layout :: navbar(${rolNav})}"></nav>
+<main class="contenedor">
+
+  <div class="fila-ordenamiento">
+    <div>
+      <h1>Platos</h1>
+      <p class="subtitulo">Menú de la unidad de venta.</p>
+    </div>
+    <a class="btn" th:href="@{/responsable/platos/nuevo}">Agregar plato</a>
+  </div>
+
+  <div th:if="${exito}" class="alerta ok" th:text="${exito}"></div>
+
+  <div class="panel tabla-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th class="num">Precio de venta</th>
+          <th class="num">Costo de producción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:if="${#lists.isEmpty(platos)}">
+          <td colspan="4">Todavía no hay platos cargados.</td>
+        </tr>
+        <tr th:each="p : ${platos}">
+          <td th:text="${p.nombre}"></td>
+          <td class="num" th:text="${'$ ' + #numbers.formatDecimal(p.precioVenta, 1, 'POINT', 2, 'COMMA')}"></td>
+          <td class="num" th:text="${'$ ' + #numbers.formatDecimal(p.costoProduccion, 1, 'POINT', 2, 'COMMA')}"></td>
+          <td>
+            <div class="acciones">
+              <a class="btn chico secundario" th:href="@{/responsable/platos/{id}/editar(id=${p.id})}">Modificar</a>
+              <form th:action="@{/responsable/platos/{id}/eliminar(id=${p.id})}" method="post"
+                    onsubmit="return confirm('¿Eliminar este plato?');">
+                <button class="btn chico peligro" type="submit">Eliminar</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+<footer th:replace="~{fragments/layout :: pie}"></footer>
 </body>
 </html>

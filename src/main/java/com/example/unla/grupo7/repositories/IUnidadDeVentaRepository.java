@@ -1,5 +1,7 @@
 package com.example.unla.grupo7.repositories;
-
+import java.util.Optional;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,4 +28,12 @@ public interface IUnidadDeVentaRepository
             Long idFestival);
 
     List<UnidadDeVenta> findByFestival_IdFestival(Long idFestival);
+    
+        // Unidad a cargo de un responsable (según el usuario con el que inició sesión)
+    @Query("select r.unidadDeVenta from Responsable r where r.user.username = :username")
+    Optional<UnidadDeVenta> findByResponsableUsername(@Param("username") String username);
+
+    // Unidad en la que trabaja un empleado activo (su usuario es su email)
+    @Query("select s.unidadDeVenta from Staff s where lower(s.email) = lower(:email) and s.activo = true")
+    Optional<UnidadDeVenta> findByEmpleadoActivoEmail(@Param("email") String email);
 }

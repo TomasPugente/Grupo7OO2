@@ -69,6 +69,12 @@
             Unidades con mayor canon
         </a>
         
+       <a class="btn"
+            th:if="${puedeGestionarPlatos}"
+            th:href="@{/responsable/platos}">
+            Gestión de platos
+        </a>
+        
         <a class="btn" th:href="@{/registro}">
             Registrar unidad de venta
         </a>
