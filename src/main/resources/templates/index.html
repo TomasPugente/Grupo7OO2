@@ -72,15 +72,19 @@
         </a>
         
        <a class="btn"
-            th:if="${puedeGestionarPlatos}"
+            th:if="${esResponsable}"
             th:href="@{/responsable/platos}">
             Gestión de platos
         </a>
         
-        
+        <a class="btn"
+            th:if="${esEmpleado}"
+            th:href="@{/responsable/platos}">
+            Gestión de pedidos
+        </a>
         <a class="btn" 
             th:if="${esAdmin}"
-            th:href="@{/registro}">
+            th:href="@{/pedidos}">
             Registrar unidad de venta
         </a>
 
