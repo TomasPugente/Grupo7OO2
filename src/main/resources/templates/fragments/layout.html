@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:fragment="head(titulo)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,8 +12,12 @@
 <!-- rol: 'publico' | 'admin' | 'responsable' | 'empleado' -->
 <nav class="navbar" th:fragment="navbar(rol)">
     <a class="marca" th:href="@{/}">Epicentro Gourmet</a>
-    <th:block th:if="${rol == 'publico'}">
+    <th:block sec:authorize="isAnonymous()">
         <a th:href="@{/login}">Iniciar sesión</a>
+    </th:block>
+
+    <th:block sec:authorize="isAuthenticated()">
+        <a th:href="@{/logout}" method="post">Cerrar sesión</a>
     </th:block>
     <th:block th:if="${rol == 'admin'}">
         <a th:href="@{/admin/festivales}">Festivales</a>

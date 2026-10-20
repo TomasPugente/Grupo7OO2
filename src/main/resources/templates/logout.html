@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Cerrar sesión')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('publico')}"></nav>
+<main class="contenedor angosto">
+  <div class="panel centrado">
+    <h1>Cerrar sesión</h1>
+    <p class="subtitulo">¿Querés salir de tu cuenta?</p>
+    <form method="post" th:action="@{/logout}" class="acciones" style="justify-content:center">
+      <button class="btn" type="submit">Cerrar sesión</button>
+      <a class="btn secundario" href="javascript:history.back()">Cancelar</a>
+    </form>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+</body>
+</html>

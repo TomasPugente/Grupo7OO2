@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Página no encontrada')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('publico')}"></nav>
+<main class="contenedor">
+<div class="panel error-pagina">
+  <p class="error-codigo">404</p>
+  <h1>No encontramos esa página</h1>
+  <p class="subtitulo">La dirección no existe o el recurso que buscás ya no está disponible.</p>
+  <div class="acciones" style="justify-content:center">
+    <a class="btn" th:href="@{/}">Volver al inicio</a>
+    <a class="btn secundario" href="javascript:history.back()">Volver atrás</a>
+  </div>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Solicitud incorrecta')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('publico')}"></nav>
+<main class="contenedor">
+<div class="panel error-pagina">
+  <p class="error-codigo">400</p>
+  <h1>Los datos enviados no son válidos</h1>
+  <p class="subtitulo">Revisá el formulario y volvé a intentarlo.</p>
+  <div class="acciones" style="justify-content:center">
+    <a class="btn" href="javascript:history.back()">Volver al formulario</a>
+  </div>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+</body>
+</html>
