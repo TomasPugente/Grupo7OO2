@@ -34,6 +34,13 @@ public class IndexController {
                             authority.getAuthority().equals("ROLE_ADMINISTRADOR"));
         mAV.addObject("esAdmin", esAdmin);
 
+                boolean puedeGestionarPlatos = authentication != null &&
+            authentication.getAuthorities().stream()
+                    .anyMatch(authority ->
+                            authority.getAuthority().equals("ROLE_RESPONSABLE")
+                            || authority.getAuthority().equals("ROLE_EMPLEADO"));
+        mAV.addObject("puedeGestionarPlatos", puedeGestionarPlatos);
+
     return mAV;
 }
 

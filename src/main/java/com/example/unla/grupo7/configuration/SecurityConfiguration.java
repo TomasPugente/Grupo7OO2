@@ -59,7 +59,8 @@ public class SecurityConfiguration {
                 .requestMatchers(
                     "/festivales/*/unidades",
                     "/festivales/reporte-mayores-canon"
-                ).hasRole("ADMINISTRADOR")
+                ).hasRole("ADMINISTRADOR").requestMatchers("/responsable/platos/**")
+                    .hasAnyRole("RESPONSABLE", "EMPLEADO")
 
                 .anyRequest().authenticated()
             )
