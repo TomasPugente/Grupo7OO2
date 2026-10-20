@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import java.util.List;
+import com.example.unla.grupo7.dtos.PlatoFiltroDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
 import com.example.unla.grupo7.services.IPlatoService;
 
@@ -39,8 +40,26 @@ public class PlatoController {
     }
 
     @GetMapping("")
-    public String listar(Authentication authentication, Model model) {
-        model.addAttribute("platos", platoService.listar(authentication.getName()));
+    public String listar(@Valid @ModelAttribute("filtro") PlatoFiltroDTO filtro,
+                         BindingResult result,
+                         Authentication authentication,
+                         Model model) {
+        String username = authentication.getName();
+        List<PlatoDTO> platos;
+
+        if (result.hasErrors()) {
+            platos = platoService.listar(username);
+        } else {
+            try {
+                platos = platoService.filtrar(filtro, username);
+            } catch (IllegalArgumentException e) {
+                result.reject("filtro.invalido", e.getMessage());
+                platos = platoService.listar(username);
+            }
+        }
+
+        model.addAttribute("platos", platos);
+        model.addAttribute("hayFiltros", filtro.hayFiltros() && !result.hasErrors());
         return VISTA_LISTA;
     }
 

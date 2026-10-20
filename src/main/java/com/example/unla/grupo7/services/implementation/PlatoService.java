@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
+import com.example.unla.grupo7.dtos.PlatoFiltroDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
 import com.example.unla.grupo7.entities.Plato;
 import com.example.unla.grupo7.entities.UnidadDeVenta;
@@ -18,7 +18,9 @@ import com.example.unla.grupo7.services.IPlatoService;
 
 @Service("platoService")
 public class PlatoService implements IPlatoService {
-
+        // Límites que se usan cuando un rango no se completó (equivale a "sin límite")
+    private static final BigDecimal MINIMO = BigDecimal.ZERO;
+    private static final BigDecimal MAXIMO = new BigDecimal("9999999999.99");
     private final IplatoRepository platoRepository;
     private final IUnidadDeVentaRepository unidadDeVentaRepository;
 
@@ -34,6 +36,27 @@ public class PlatoService implements IPlatoService {
         UnidadDeVenta unidad = unidadDelUsuario(username);
         return platoRepository
                 .findByUnidadDeVenta_IdUnidadDeVentaAndActivoTrueOrderByNombreAsc(unidad.getIdUnidadDeVenta())
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+        @Override
+    @Transactional(readOnly = true)
+    public List<PlatoDTO> filtrar(PlatoFiltroDTO filtro, String username) {
+        validarRango("precio", filtro.getPrecioMin(), filtro.getPrecioMax());
+        validarRango("costo", filtro.getCostoMin(), filtro.getCostoMax());
+
+        UnidadDeVenta unidad = unidadDelUsuario(username);
+        String nombre = filtro.getNombre() == null ? "" : filtro.getNombre().trim();
+
+        return platoRepository.filtrar(
+                        unidad.getIdUnidadDeVenta(),
+                        nombre,
+                        filtro.getPrecioMin() != null ? filtro.getPrecioMin() : MINIMO,
+                        filtro.getPrecioMax() != null ? filtro.getPrecioMax() : MAXIMO,
+                        filtro.getCostoMin() != null ? filtro.getCostoMin() : MINIMO,
+                        filtro.getCostoMax() != null ? filtro.getCostoMax() : MAXIMO)
                 .stream()
                 .map(this::toDTO)
                 .toList();
@@ -109,6 +132,13 @@ public class PlatoService implements IPlatoService {
         if (precio != null && costo != null && precio.compareTo(costo) < 0) {
             throw new IllegalArgumentException(
                     "El precio de venta no puede ser menor al costo de producción.");
+        }
+    }
+
+        private void validarRango(String atributo, BigDecimal min, BigDecimal max) {
+        if (min != null && max != null && min.compareTo(max) > 0) {
+            throw new IllegalArgumentException(
+                    "El " + atributo + " mínimo no puede ser mayor al " + atributo + " máximo.");
         }
     }
 
