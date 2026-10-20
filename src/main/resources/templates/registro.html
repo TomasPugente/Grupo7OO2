@@ -10,6 +10,12 @@
 <div class="alerta error" th:if="${error != null}" th:text="${error}"></div>
 
 <form method="post" th:action="@{/registro}" th:object="${registro}">
+<div class="alerta error" th:if="${#fields.hasErrors('*')}">
+  <strong>Revisá los siguientes datos:</strong>
+  <ul>
+    <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
+  </ul>
+</div>
 <fieldset>
   <legend>Datos del responsable</legend>
   <div class="fila">
@@ -45,8 +51,8 @@
         <option value="PUESTO">Puesto desarmable</option>
       </select></div>
   </div>
-  <p class="ayuda">Completá solo los campos del tipo elegido.</p>
-  <div class="fila">
+  <p class="ayuda">Solo se habilitan los campos del tipo seleccionado.</p>
+  <div class="fila" id="campos-foodtruck">
     <div><label for="patente">Patente (Food Truck)</label><input id="patente" th:field="*{patente}"></div>
     <div><label for="elec">Requiere electricidad</label>
       <select id="elec" th:field="*{requiereElectricidad}">
@@ -54,6 +60,8 @@
         <option value="true">Sí</option>
         <option value="false">No</option>
       </select></div>
+  </div>
+  <div class="fila" id="campos-puesto">
     <div><label for="carpas">Cantidad de carpas (Puesto)</label><input id="carpas" th:field="*{cantidadCarpas}" type="number" min="1"></div>
     <div><label for="montaje">Tiempo de montaje en minutos (Puesto)</label><input id="montaje" th:field="*{tiempoMontaje}" type="number" min="0"></div>
   </div>
@@ -63,6 +71,43 @@
   <a class="btn secundario" th:href="@{/index}">Cancelar</a>
 </div>
 </form>
+
+<script>
+(function () {
+    const tipoSelect = document.getElementById('tipo');
+    const grupoFoodTruck = document.getElementById('campos-foodtruck');
+    const grupoPuesto = document.getElementById('campos-puesto');
+
+    const camposFoodTruck = ['patente', 'elec'];
+    const camposPuesto = ['carpas', 'montaje'];
+
+    function aplicar(ids, deshabilitar) {
+        ids.forEach(function (id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.disabled = deshabilitar;
+            if (deshabilitar) {
+                if (el.tagName === 'SELECT') {
+                    el.selectedIndex = 0;
+                } else {
+                    el.value = '';
+                }
+            }
+        });
+    }
+
+    function toggle() {
+        const esFoodTruck = tipoSelect.value === 'FOOD_TRUCK';
+        aplicar(camposFoodTruck, !esFoodTruck);
+        aplicar(camposPuesto, esFoodTruck);
+        grupoFoodTruck.style.opacity = esFoodTruck ? '1' : '.5';
+        grupoPuesto.style.opacity = esFoodTruck ? '.5' : '1';
+    }
+
+    tipoSelect.addEventListener('change', toggle);
+    toggle();
+})();
+</script>
 </main>
 <footer th:replace="~{fragments/layout :: pie}"></footer>
 </body>
