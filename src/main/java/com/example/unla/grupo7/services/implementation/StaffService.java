@@ -16,6 +16,8 @@ import com.example.unla.grupo7.repositories.IStaffRepository;
 import com.example.unla.grupo7.repositories.IUnidadDeVentaRepository;
 import com.example.unla.grupo7.repositories.IUserRepository;
 import com.example.unla.grupo7.services.IStaffService;
+import com.example.unla.grupo7.entities.Cajero;
+import com.example.unla.grupo7.entities.Cocinero;
 
 @Service
 public class StaffService implements IStaffService {
@@ -69,12 +71,37 @@ public class StaffService implements IStaffService {
                 new IllegalArgumentException("El empleado no existe."));
     }
 
+    
     @Override
     @Transactional
     public void alta(StaffFormDTO dto) {
 
         validarDni(dto.getDni(), null);
         validarEmail(dto.getEmail(), null);
+
+        Staff staff;
+
+        if ("Cajero".equals(dto.getTipoEmpleado())) {
+            staff = new Cajero();
+
+        } else if ("Cocinero".equals(dto.getTipoEmpleado())) {
+
+            if (dto.getEspecialidad() == null
+                    || dto.getEspecialidad().isBlank()) {
+                throw new IllegalArgumentException(
+                    "Debe indicar la especialidad del cocinero.");
+            }
+
+            Cocinero cocinero = new Cocinero();
+            cocinero.setEspecialidad(dto.getEspecialidad().trim());
+
+            staff = cocinero;
+
+        } else {
+            throw new IllegalArgumentException(
+                "Debe seleccionar Cajero o Cocinero.");
+        }
+    
 
         String email = normalizarEmail(dto.getEmail());
         String passwordEnClaro = generarPasswordAleatorio();
@@ -91,16 +118,14 @@ public class StaffService implements IStaffService {
         user.getUserRoles().add(rol);
         user = userRepository.save(user);
 
-        Staff staff = new Staff();
         copiarDatos(dto, staff);
         staff.setEmail(email);
         staff.setActivo(true);
         staff.setUser(user);
 
+        // El sueldo no se asigna: queda null inicialmente.
         staffRepository.save(staff);
 
-        // Si el envío falla, la excepción impide confirmar
-        // esta transacción.
         emailService.enviarCredenciales(
             email,
             user.getUsername(),
@@ -108,11 +133,40 @@ public class StaffService implements IStaffService {
         );
     }
 
+
     @Override
     @Transactional
     public void modificar(long id, StaffFormDTO dto) {
 
         Staff staff = buscarPorId(id);
+
+        String tipoActual;
+
+        if (staff instanceof Cajero) {
+            tipoActual = "Cajero";
+        } else if (staff instanceof Cocinero) {
+            tipoActual = "Cocinero";
+        } else {
+            throw new IllegalStateException(
+                "El empleado tiene un tipo no reconocido.");
+        }
+
+        if (!tipoActual.equals(dto.getTipoEmpleado())) {
+            throw new IllegalArgumentException(
+                "No se puede cambiar el tipo de un empleado existente.");
+        }
+
+        if (staff instanceof Cocinero cocinero) {
+
+            if (dto.getEspecialidad() == null
+                    || dto.getEspecialidad().isBlank()) {
+                throw new IllegalArgumentException(
+                    "Debe indicar la especialidad del cocinero.");
+            }
+
+            cocinero.setEspecialidad(dto.getEspecialidad().trim());
+        }
+
 
         if (!staff.isActivo()) {
             throw new IllegalArgumentException(
@@ -198,7 +252,6 @@ public class StaffService implements IStaffService {
         staff.setDni(dto.getDni());
         staff.setFechaNacimiento(dto.getFechaNacimiento());
         staff.setFechaIngreso(dto.getFechaIngreso());
-        staff.setSueldo(dto.getSueldo());
 
         if (dto.getUnidadDeVentaId() == null) {
             staff.setUnidadDeVenta(null);

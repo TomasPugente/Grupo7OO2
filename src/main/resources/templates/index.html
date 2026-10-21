@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="~{fragments/layout :: head('Inicio')}"></head>
 
@@ -71,6 +72,18 @@
         
         <a class="btn" th:href="@{/registro}">
             Registrar unidad de venta
+        </a>
+   
+        <a class="btn"
+            sec:authorize="hasRole('RESPONSABLE')"
+            th:href="@{/empleado}">
+            Ver lista de empleados
+        </a>
+
+        <a class="btn"
+            sec:authorize="hasRole('RESPONSABLE')"
+            th:href="@{/empleado/nuevo}">
+            Ingresar empleado
         </a>
 
         <a class="btn secundario" th:href="@{/login}">

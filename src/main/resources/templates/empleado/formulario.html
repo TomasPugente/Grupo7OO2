@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Formulario de empleado')}"></head>
@@ -19,8 +20,8 @@
 
     <form th:object="${staffForm}"
           th:action="${idEmpleado != null}
-              ? @{/empleados/{id}/editar(id=${idEmpleado})}
-              : @{/empleados}"
+              ? @{/empleado/{id}/editar(id=${idEmpleado})}
+              : @{/empleado}"
           method="post">
 
         <div>
@@ -61,18 +62,35 @@
         </div>
 
         <div>
-            <label for="sueldo">Sueldo</label>
-            <input id="sueldo" type="number" step="0.01"
-                   th:field="*{sueldo}" min="0.01" required>
-            <p th:if="${#fields.hasErrors('sueldo')}"
-               th:errors="*{sueldo}"></p>
-        </div>
-
-        <div>
             <label for="email">Email (usuario de acceso)</label>
             <input id="email" type="email" th:field="*{email}" required>
             <p th:if="${#fields.hasErrors('email')}"
                th:errors="*{email}"></p>
+        </div>
+
+        <div>
+            <label for="tipoEmpleado">Tipo de empleado</label>
+
+            <select id="tipoEmpleado"
+                    th:field="*{tipoEmpleado}"
+                    th:disabled="${idEmpleado != null}"
+                    required>
+                <option value="">Seleccione un tipo</option>
+                <option value="Cajero">Cajero</option>
+                <option value="Cocinero">Cocinero</option>
+            </select>
+
+            <input type="hidden"
+                   th:if="${idEmpleado != null}"
+                   th:field="*{tipoEmpleado}">
+        </div>
+
+        <div id="campoEspecialidad">
+            <label for="especialidad">Especialidad del cocinero</label>
+            <input id="especialidad"
+                   type="text"
+                   th:field="*{especialidad}"
+                   maxlength="100">
         </div>
 
         <div>
@@ -86,13 +104,38 @@
             </select>
         </div>
 
+        <p>El sueldo no se carga en este formulario.</p>
+
         <div class="acciones">
             <button class="btn" type="submit">Guardar</button>
-            <a class="btn secundario" th:href="@{/empleados}">Cancelar</a>
+            <a class="btn secundario" th:href="@{/empleado}">Cancelar</a>
         </div>
     </form>
 </main>
 
 <footer th:replace="~{fragments/layout :: pie}"></footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const tipo = document.getElementById("tipoEmpleado");
+    const campoEspecialidad = document.getElementById("campoEspecialidad");
+    const especialidad = document.getElementById("especialidad");
+
+    function actualizarEspecialidad() {
+        const esCocinero = tipo.value === "Cocinero";
+
+        campoEspecialidad.style.display = esCocinero ? "" : "none";
+        especialidad.required = esCocinero;
+
+        if (!esCocinero) {
+            especialidad.value = "";
+        }
+    }
+
+    tipo.addEventListener("change", actualizarEspecialidad);
+    actualizarEspecialidad();
+});
+</script>
+
 </body>
 </html>

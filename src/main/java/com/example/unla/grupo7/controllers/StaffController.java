@@ -13,11 +13,13 @@ import com.example.unla.grupo7.dtos.StaffFormDTO;
 import com.example.unla.grupo7.entities.Staff;
 import com.example.unla.grupo7.repositories.IUnidadDeVentaRepository;
 import com.example.unla.grupo7.services.IStaffService;
+import com.example.unla.grupo7.entities.Cajero;
+import com.example.unla.grupo7.entities.Cocinero;
 
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/empleados")
+@RequestMapping("/empleado")
 @PreAuthorize("hasRole('RESPONSABLE')")
 public class StaffController {
 
@@ -85,12 +87,17 @@ public class StaffController {
         Staff staff = staffService.buscarPorId(id);
 
         StaffFormDTO dto = new StaffFormDTO();
+        if (staff instanceof Cajero) {
+            dto.setTipoEmpleado("Cajero");
+        } else if (staff instanceof Cocinero cocinero) {
+            dto.setTipoEmpleado("Cocinero");
+            dto.setEspecialidad(cocinero.getEspecialidad());
+        }
         dto.setNombre(staff.getNombre());
         dto.setApellido(staff.getApellido());
         dto.setDni(staff.getDni());
         dto.setFechaNacimiento(staff.getFechaNacimiento());
         dto.setFechaIngreso(staff.getFechaIngreso());
-        dto.setSueldo(staff.getSueldo());
         dto.setEmail(staff.getEmail());
 
         if (staff.getUnidadDeVenta() != null) {

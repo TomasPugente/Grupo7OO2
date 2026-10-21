@@ -11,11 +11,11 @@
     <p th:if="${error}" th:text="${error}"></p>
 
     <div class="acciones">
-        <a class="btn" th:href="@{/empleados/nuevo}">
+        <a class="btn" th:href="@{/empleado/nuevo}">
             Agregar empleado
         </a>
 
-        <a class="btn secundario" th:href="@{/empleados/inactivos}">
+        <a class="btn secundario" th:href="@{/empleado/inactivos}">
             Ver empleados dados de baja
         </a>
     </div>
@@ -50,11 +50,11 @@
                     <td>
                         <div class="acciones">
                             <a class="btn secundario"
-                               th:href="@{/empleados/{id}/editar(id=${empleado.id})}">
+                               th:href="@{/empleado/{id}/editar(id=${empleado.id})}">
                                 Modificar
                             </a>
 
-                            <form th:action="@{/empleados/{id}/eliminar(id=${empleado.id})}"
+                            <form th:action="@{/empleado/{id}/eliminar(id=${empleado.id})}"
                                   method="post"
                                   onsubmit="return confirm('¿Dar de baja a este empleado?');">
 

@@ -1,6 +1,5 @@
 package com.example.unla.grupo7.dtos;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import jakarta.validation.constraints.Email;
@@ -28,13 +27,14 @@ public class StaffFormDTO {
     @NotNull
     private LocalDate fechaIngreso;
 
-    @NotNull
-    @Positive
-    private BigDecimal sueldo;
-
     @NotBlank
     @Email
     private String email;
+
+    @NotBlank
+    private String tipoEmpleado;
+
+    private String especialidad;
 
     private Long unidadDeVentaId;
 }
