@@ -97,15 +97,27 @@ public class RegistroService implements IRegistroService {
         UnidadDeVenta unidad;
         switch (dto.getTipo()) {
             case "FOOD_TRUCK" -> {
+                if (dto.getPatente() == null || dto.getPatente().isBlank()) {
+                    throw new IllegalArgumentException("La patente es obligatoria para un Food Truck.");
+                }
+                if (dto.getRequiereElectricidad() == null) {
+                    throw new IllegalArgumentException("Indicá si el Food Truck requiere electricidad.");
+                }
                 FoodTruck ft = new FoodTruck();
-                ft.setPatente(dto.getPatente());
-                ft.setRequiereElectricidad(Boolean.TRUE.equals(dto.getRequiereElectricidad()));
+                ft.setPatente(dto.getPatente().trim());
+                ft.setRequiereElectricidad(dto.getRequiereElectricidad());
                 unidad = ft;
             }
             case "PUESTO" -> {
+                if (dto.getCantidadCarpas() == null || dto.getCantidadCarpas() < 1) {
+                    throw new IllegalArgumentException("Ingresá una cantidad de carpas válida para el puesto.");
+                }
+                if (dto.getTiempoMontaje() == null || dto.getTiempoMontaje() < 0) {
+                    throw new IllegalArgumentException("Ingresá el tiempo de montaje del puesto.");
+                }
                 PuestoDesarmable puesto = new PuestoDesarmable();
-                puesto.setCantidadCarpas(dto.getCantidadCarpas() == null ? 0 : dto.getCantidadCarpas());
-                puesto.setTiempoMontaje(dto.getTiempoMontaje() == null ? 0 : dto.getTiempoMontaje());
+                puesto.setCantidadCarpas(dto.getCantidadCarpas());
+                puesto.setTiempoMontaje(dto.getTiempoMontaje());
                 unidad = puesto;
             }
             default -> throw new IllegalArgumentException("Tipo de unidad inválido: " + dto.getTipo());
