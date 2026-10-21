@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Empleados inactivos')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('publico')}"></nav>
+
+<main class="panel">
+    <h1>Empleados dados de baja</h1>
+
+    <p th:if="${mensaje}" th:text="${mensaje}"></p>
+
+    <div class="acciones">
+        <a class="btn secundario" th:href="@{/empleado}">
+            Volver a empleados activos
+        </a>
+    </div>
+
+    <div class="tabla-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>DNI</th>
+                    <th>Email</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="empleado : ${empleados}">
+                    <td th:text="${empleado.nombre}"></td>
+                    <td th:text="${empleado.apellido}"></td>
+                    <td th:text="${empleado.dni}"></td>
+                    <td th:text="${empleado.email}"></td>
+
+                    <td>
+                        <form th:action="@{/empleado/{id}/reactivar(id=${empleado.id})}"
+                              method="post"
+                              onsubmit="return confirm('¿Reactivar a este empleado?');">
+
+                            <button class="btn" type="submit">
+                                Reactivar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(empleados)}">
+                    <td colspan="5">No hay empleados dados de baja.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+</body>
+</html>

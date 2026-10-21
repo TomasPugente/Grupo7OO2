@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Empleados')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('publico')}"></nav>
+
+<main class="panel">
+    <h1>Empleados</h1>
+
+    <p th:if="${mensaje}" th:text="${mensaje}"></p>
+    <p th:if="${error}" th:text="${error}"></p>
+
+    <div class="acciones">
+        <a class="btn" th:href="@{/empleado/nuevo}">
+            Agregar empleado
+        </a>
+
+        <a class="btn secundario" th:href="@{/empleado/inactivos}">
+            Ver empleados dados de baja
+        </a>
+    </div>
+
+    <div class="tabla-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>DNI</th>
+                    <th>Email</th>
+                    <th>Sueldo</th>
+                    <th>Unidad de venta</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="empleado : ${empleados}">
+                    <td th:text="${empleado.nombre}"></td>
+                    <td th:text="${empleado.apellido}"></td>
+                    <td th:text="${empleado.dni}"></td>
+                    <td th:text="${empleado.email}"></td>
+                    <td th:text="${empleado.sueldo}"></td>
+
+                    <td th:text="${empleado.unidadDeVenta != null
+                        ? empleado.unidadDeVenta.nombreComercial
+                        : 'Sin asignar'}">
+                    </td>
+
+                    <td>
+                        <div class="acciones">
+                            <a class="btn secundario"
+                               th:href="@{/empleado/{id}/editar(id=${empleado.id})}">
+                                Modificar
+                            </a>
+
+                            <form th:action="@{/empleado/{id}/eliminar(id=${empleado.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('¿Dar de baja a este empleado?');">
+
+                                <button class="btn secundario" type="submit">
+                                    Dar de baja
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(empleados)}">
+                    <td colspan="7">No hay empleados activos registrados.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+</body>
+</html>
