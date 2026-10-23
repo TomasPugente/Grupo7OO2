@@ -22,24 +22,24 @@
     <div class="panel">
         <h2>Mi unidad de venta</h2>
         <div class="fila">
-            <div class="dato"><small>Nombre comercial</small><strong>Dulce Ruta</strong></div>
-            <div class="dato"><small>Código</small><strong>FT00000001</strong></div>
-            <div class="dato"><small>Tipo</small><strong>Food Truck</strong></div>
-            <div class="dato"><small>Festival</small><strong>Festival del Chocolate</strong></div>
+            <div class="dato"><small>Nombre comercial</small><strong th:text="${unidad.nombreComercial}"></strong></div>
+            <div class="dato"><small>Código</small><strong th:text="${unidad.codigo}"></strong></div>
+            <div class="dato"><small>Tipo</small><strong th:text="${unidad.nombreComercial}"></strong></div>
+            <div class="dato"><small>Festival</small><strong th:text="${festival.nombre}">Festival del Chocolate</strong></div>
         </div>
     </div>
 
     <div class="fila">
-        <div class="panel"><div class="dato"><small>Recaudación total</small><strong>$ 1.250.000</strong></div></div>
-        <div class="panel"><div class="dato"><small>Canon</small><strong>$ 11.000</strong></div></div>
-        <div class="panel"><div class="dato"><small>Rentabilidad neta</small><strong>$ 640.000</strong></div></div>
+        <div class="panel"><div class="dato"><small >Recaudación total</small><strong th:text="${unidad.recaudacion}">$ 1.250.000</strong></div></div>
+<!--         <div class="panel"><div class="dato"><small>Canon</small><strong>$ 11.000</strong></div></div>
+ -->    <div class="panel"><div class="dato"><small>Rentabilidad neta</small><strong>$ 640.000</strong></div></div>
         <div class="panel"><div class="dato"><small>Empleados activos</small><strong>6</strong></div></div>
     </div>
 
-    <div class="panel">
+<!--     <div class="panel">
         <h2>Plato estrella</h2>
         <p><strong>Brownie con helado</strong> <span class="etiqueta">320 pedidos</span></p>
-    </div>
+    </div> -->
 
     <div class="panel tabla-wrap">
         <h2>Últimos pedidos</h2>

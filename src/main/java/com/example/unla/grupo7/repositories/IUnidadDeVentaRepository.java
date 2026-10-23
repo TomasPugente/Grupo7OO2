@@ -33,6 +33,10 @@ public interface IUnidadDeVentaRepository
     @Query("select r.unidadDeVenta from Responsable r where r.user.username = :username")
     Optional<UnidadDeVenta> findByResponsableUsername(@Param("username") String username);
 
+
+        @Query("select s.unidadDeVenta from Staff s where s.user.username = :username")
+    Optional<UnidadDeVenta> findByStaffUsername(@Param("username") String username);
+
     // Unidad en la que trabaja un empleado activo (su usuario es su email)
     @Query("select s.unidadDeVenta from Staff s where lower(s.email) = lower(:email) and s.activo = true")
     Optional<UnidadDeVenta> findByEmpleadoActivoEmail(@Param("email") String email);

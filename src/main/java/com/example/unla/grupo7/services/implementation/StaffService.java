@@ -51,6 +51,11 @@ public class StaffService implements IStaffService {
         this.emailService = emailService;
     }
 
+    public Staff buscarPorNombre(String username) {
+        return staffRepository.findByUser_Username(username).orElse(null);
+    }
+
+
     @Override
     @Transactional(readOnly = true)
     public List<Staff> listarActivos() {

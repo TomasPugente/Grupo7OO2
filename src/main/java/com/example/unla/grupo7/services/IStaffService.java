@@ -13,6 +13,8 @@ public interface IStaffService {
 
     Staff buscarPorId(long id);
 
+    Staff buscarPorNombre(String username);
+
     void alta(StaffFormDTO dto);
 
     void modificar(long id, StaffFormDTO dto);

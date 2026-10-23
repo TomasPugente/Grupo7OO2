@@ -15,6 +15,10 @@ public interface IStaffRepository extends JpaRepository<Staff, Long> {
 
     Optional<Staff> findByDni(int dni);
 
+    Optional<Staff> findByUser_Username(String username);
+
+    
+
     boolean existsByEmailIgnoreCase(String email);
 
     boolean existsByDni(int dni);

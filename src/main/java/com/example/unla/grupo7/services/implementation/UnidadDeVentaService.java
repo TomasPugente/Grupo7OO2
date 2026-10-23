@@ -10,15 +10,38 @@ import com.example.unla.grupo7.entities.FoodTruck;
 import com.example.unla.grupo7.entities.PuestoDesarmable;
 import com.example.unla.grupo7.entities.UnidadDeVenta;
 import com.example.unla.grupo7.repositories.IUnidadDeVentaRepository;
+import com.example.unla.grupo7.services.IUnidadDeVentaService;
 
 @Service
-public class UnidadDeVentaService {
+public class UnidadDeVentaService implements IUnidadDeVentaService{
 
     private final IUnidadDeVentaRepository unidadDeVentaRepository;
 
     public UnidadDeVentaService(
             IUnidadDeVentaRepository unidadDeVentaRepository) {
         this.unidadDeVentaRepository = unidadDeVentaRepository;
+
+    }
+
+
+    public UnidadDeVenta buscarUnidadPorResponsableUsername(String username) {
+        return unidadDeVentaRepository
+                .findByResponsableUsername(username)
+                .orElseThrow(() ->
+                    new RuntimeException(
+                        "El responsable no tiene una unidad de venta asociada"
+                    )
+                );
+    }
+
+    public UnidadDeVenta buscarUnidadPorStaffUsername(String username) {
+            return unidadDeVentaRepository
+                .findByStaffUsername(username)
+                .orElseThrow(() ->
+                    new RuntimeException(
+                        "El usuario no tiene una unidad de venta asociada"
+                    )
+                );
     }
 
     // Calcula el canon que debe pagar una unidad de venta
