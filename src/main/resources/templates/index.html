@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org"
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="~{fragments/layout :: head('Inicio')}"></head>
@@ -11,13 +12,43 @@
 <main class="contenedor">
 
     <h1>Festivales</h1>
+    <p class="subtitulo">Festivales gastronómicos del predio.</p>
 
-    <p class="subtitulo">
-        Festivales gastronómicos del predio.
-    </p>
+    <div class="barra-acciones">
+
+        <a class="btn"
+           th:if="${esResponsable} or ${esEmpleado}"
+           th:href="${esResponsable} ? @{/responsable/dashboard} : @{/empleado/dashboard}">
+            Dashboard
+        </a>
+
+        <a class="btn"
+           th:if="${esAdmin}"
+           th:href="@{/pedidos}">
+            Registrar unidad de venta
+        </a>
+
+        <a class="btn"
+           th:if="${esAdmin}"
+           th:href="@{/festivales/reporte-mayores-canon}">
+            Unidades con mayor canon
+        </a>
+
+        <a class="btn secundario separador"
+           sec:authorize="isAnonymous()"
+           th:href="@{/login}">
+            Iniciar sesión
+        </a>
+
+        <form class="separador"
+              sec:authorize="isAuthenticated()"
+              th:action="@{/logout}" method="post">
+            <button class="btn secundario" type="submit">Cerrar sesión</button>
+        </form>
+
+    </div>
 
     <div class="panel tabla-wrap">
-
         <table>
             <thead>
                 <tr>
@@ -28,89 +59,22 @@
                     <th>Unidades de venta</th>
                 </tr>
             </thead>
-
             <tbody>
                 <tr th:each="festival : ${festivales}">
-
+                    <td th:text="${festival.nombre}"></td>
+                    <td th:text="${festival.temporada}"></td>
+                    <td th:text="${festival.fechaInicio}"></td>
+                    <td th:text="${festival.fechaFin}"></td>
                     <td>
-                        <span th:text="${festival.nombre}"></span>
-                    </td>
-
-                    <td>
-                        <span th:text="${festival.temporada}"></span>
-                    </td>
-
-                    <td>
-                        <span th:text="${festival.fechaInicio}"></span>
-                    </td>
-
-                    <td>
-                        <span th:text="${festival.fechaFin}"></span>
-                    </td>
-
-                    <td>
-                        <a class="btn"
-                            th:if="${esAdmin}"
-                            th:href="@{/festivales/{id}/unidades(id=${festival.idFestival})}">
+                        <a class="btn chico"
+                           th:if="${esAdmin}"
+                           th:href="@{/festivales/{id}/unidades(id=${festival.idFestival})}">
                             Ver unidades
                         </a>
                     </td>
-
                 </tr>
             </tbody>
-
         </table>
-
-    </div>
-
-    <div class="acciones">
-        <a class="btn"
-            th:if="${esAdmin}"
-            th:href="@{/festivales/reporte-mayores-canon}">
-            Unidades con mayor canon
-        </a>
-        
-       <a class="btn"
-            th:if="${esResponsable}"
-            th:href="@{/responsable/platos}">
-            Gestión de platos
-        </a>
-        
-        <a class="btn"
-            th:if="${esEmpleado}"
-            th:href="@{/responsable/platos}">
-            Gestión de pedidos
-        </a>
-        <a class="btn" 
-            th:if="${esAdmin}"
-            th:href="@{/pedidos}">
-            Registrar unidad de venta
-        </a>
-   
-        <a class="btn"
-            sec:authorize="hasRole('RESPONSABLE')"
-            th:href="@{/empleado}">
-            Ver lista de empleados
-        </a>
-
-        <a class="btn"
-            sec:authorize="hasRole('RESPONSABLE')"
-            th:href="@{/empleado/nuevo}">
-            Ingresar empleado
-        </a>
-
-<a class="btn secundario"
-   sec:authorize="isAnonymous()"
-   th:href="@{/login}">
-    Iniciar sesión
-</a>
-
-<a sec:authorize="isAuthenticated()"
-      th:href="@{/logout}"
-      method="post"
-      class="btn secundario">
-    Cerrar sesión
-</a>
     </div>
 
 </main>

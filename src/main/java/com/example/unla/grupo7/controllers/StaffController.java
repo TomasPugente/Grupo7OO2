@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.unla.grupo7.dtos.StaffDTO;
 import com.example.unla.grupo7.dtos.StaffFormDTO;
 import com.example.unla.grupo7.entities.Staff;
+import com.example.unla.grupo7.helper.ViewRouteHelper;
 import com.example.unla.grupo7.repositories.IUnidadDeVentaRepository;
 import com.example.unla.grupo7.services.IStaffService;
 import com.example.unla.grupo7.entities.Cajero;
@@ -33,7 +34,15 @@ public class StaffController {
         this.unidadRepository = unidadRepository;
     }
 
-    @GetMapping
+
+    @GetMapping ("/dashboard")
+    public ModelAndView dashboardEmpleado(){
+        ModelAndView mAV= new ModelAndView(ViewRouteHelper.RESPONSABLE_DASHBOARD);
+        return mAV;
+    }
+
+
+    @GetMapping("/listar")
     public ModelAndView listar() {
         ModelAndView mAV= new ModelAndView("empleado/lista");
         mAV.addObject("empleados", staffService.listarActivos());
