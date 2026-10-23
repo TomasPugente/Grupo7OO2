@@ -49,7 +49,6 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/",
-                    "/index",
                     "/login",
                     "/css/**",
                     "/js/**",
@@ -69,13 +68,13 @@ public class SecurityConfiguration {
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/index", true)
+                .defaultSuccessUrl("/", true)
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
 
             .logout(logout -> logout
-                .logoutSuccessUrl("/index?logout=true")
+                .logoutSuccessUrl("/?logout=true")
                 .permitAll()
             );
 

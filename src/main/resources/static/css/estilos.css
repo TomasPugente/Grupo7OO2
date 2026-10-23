@@ -51,13 +51,18 @@ legend{font-weight:600;padding:0 .4rem}
 .ayuda{color:var(--texto-suave);font-size:.8rem;margin:-.75rem 0 1rem}
 
 /* Botones */
-.btn{display:inline-block;background:var(--primario);color:#fff;border:0;border-radius:4px;padding:.55rem 1.1rem;font:inherit;font-weight:600;text-decoration:none;cursor:pointer}
+.btn{display:inline-block;background:var(--primario);color:#fff;border:0;border-radius:4px;padding:.55rem 1.1rem;font:inherit;font-weight:600;text-decoration:none;cursor:pointer;}
 .btn:hover{background:var(--primario-osc)}
 .btn.secundario{background:#fff;color:var(--primario);border:1px solid var(--primario)}
 .btn.secundario:hover{background:#eef3f4}
 .btn.peligro{background:var(--error)}
 .btn.chico{padding:.25rem .65rem;font-size:.85rem}
 .acciones{display:flex;gap:.5rem;flex-wrap:wrap}
+
+/* Barra de botones sobre la tabla */
+.barra-acciones{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.barra-acciones form{margin:0}
+.barra-acciones .separador{margin-left:auto} /* empuja lo que sigue hacia la derecha */
 
 /* Tablas */
 .tabla-wrap{overflow-x:auto}
