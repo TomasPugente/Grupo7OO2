@@ -1,5 +1,6 @@
 package com.example.unla.grupo7.entities;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -28,6 +29,8 @@ public class Pedido {
 
     @OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY)
     private Set<DetallePedido> detallePedidos = new HashSet<>();
+    
+    private BigDecimal precioTotal;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidad_de_venta_id")

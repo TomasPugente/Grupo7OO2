@@ -18,6 +18,8 @@ public interface IplatoRepository extends JpaRepository<Plato, Long> {
     // Todos los platos (activos o no) de una unidad con ese nombre
     List<Plato> findByUnidadDeVenta_IdUnidadDeVentaAndNombreIgnoreCase(Long idUnidadDeVenta, String nombre);
 
+    List<Plato> findByUnidadDeVenta_IdUnidadDeVentaAndActivoTrue(Long unidadId);
+
         // Filtro por uno o varios atributos. Siempre excluye los eliminados lógicamente (activo = false).
     @Query("""
             select p from Plato p

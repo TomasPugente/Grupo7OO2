@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Pedidos')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('responsable')}"></nav>
+<main class="contenedor">
+
+    <h1>Lista de pedidos</h1>
+    <p class="subtitulo">Pedidos registrados en tu unidad de venta.</p>
+
+    <div class="barra-acciones">
+        <a class="btn" th:href="@{/empleado/pedidos/nuevo}">Cargar pedido</a>
+    </div>
+
+    <div class="panel tabla-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha del pedido</th>
+                    <th class="num">Costo total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="pedido : ${pedidos}">
+                    <td th:text="${pedido.fechaTransaccion}"></td>
+                    <td class="num" th:text="${pedido.precioTotal}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(pedidos)}">
+                    <td colspan="2">Todavía no hay pedidos cargados.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+</body>
+</html>

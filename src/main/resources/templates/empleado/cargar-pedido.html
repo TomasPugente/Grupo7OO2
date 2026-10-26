@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Nuevo pedido')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('responsable')}"></nav>
+<main class="contenedor">
+
+    <h1>Nuevo pedido</h1>
+    <p class="subtitulo">Indicá la cantidad de cada plato. Los platos en 0 no se incluyen.</p>
+
+<div class="alerta error" th:if="${error}" th:text="${error}">Error</div>
+
+<form method="post" th:action="@{/empleado/pedidos}" th:object="${pedidoForm}">
+
+    <div class="alerta error" th:if="${#fields.hasGlobalErrors()}">
+        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}" style="margin:0">Error</p>
+    </div>
+
+        <div class="panel">
+            <div class="fila">
+                <div>
+                    <label for="fecha">Fecha del pedido</label>
+                    <input id="fecha" type="date" readonly
+                           th:value="${#temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}">
+                    <p class="ayuda">Siempre es la fecha de hoy.</p>
+                </div>
+                <div>
+                    <label>Unidad de venta</label>
+                    <input type="text" readonly th:value="${unidad.nombreComercial}" value="Dulce Ruta">
+                </div>
+            </div>
+        </div>
+
+        <div class="panel tabla-wrap">
+            <h2>Platos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Plato</th>
+                        <th class="num">Precio de venta</th>
+                        <th class="num" style="width:140px">Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="plato, stat : ${platos}">
+                        <td>
+                            <span th:text="${plato.nombre}">Brownie con helado</span>
+                            <input type="hidden"
+                                th:name="|items[${stat.index}].platoId|"
+                                th:value="${plato.id}">
+                        </td>
+                        <td class="num" th:text="${plato.precioVenta}">$ 4.500</td>
+                        <td class="num">
+                            <input type="number" min="0" step="1" style="margin-bottom:0"
+                                th:name="|items[${stat.index}].cantidad|"
+                                th:value="${pedidoForm.items.size() > stat.index ? pedidoForm.items[stat.index].cantidad : 0}">
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(platos)}">
+                        <td colspan="3">No tenés platos activos.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="acciones">
+            <button class="btn" type="submit">Guardar pedido</button>
+            <a class="btn secundario" th:href="@{/empleado/pedidos}">Cancelar</a>
+        </div>
+
+    </form>
+
+</main>
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+</body>
+</html>
