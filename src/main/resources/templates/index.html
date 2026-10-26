@@ -24,13 +24,13 @@
 
         <a class="btn"
            th:if="${esAdmin}"
-           th:href="@{/pedidos}">
+           th:href="@{/admin/registrarunidad}">
             Registrar unidad de venta
         </a>
 
         <a class="btn"
            th:if="${esAdmin}"
-           th:href="@{/festivales/reporte-mayores-canon}">
+           th:href="@{/admin/reporte-mayores-canon}">
             Unidades con mayor canon
         </a>
 
@@ -68,7 +68,7 @@
                     <td>
                         <a class="btn chico"
                            th:if="${esAdmin}"
-                           th:href="@{/festivales/{id}/unidades(id=${festival.idFestival})}">
+                           th:href="@{/admin/{id}/unidades(id=${festival.idFestival})}">
                             Ver unidades
                         </a>
                     </td>

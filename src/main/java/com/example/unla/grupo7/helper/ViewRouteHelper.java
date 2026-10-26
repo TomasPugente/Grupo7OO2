@@ -7,7 +7,7 @@ public class ViewRouteHelper {
 	// USER
 	public final static String LOGIN = "user/login";
 	public final static String LOGOUT = "user/logout";
-	public final static String REGISTRO = "user/registro";
+	public final static String REGISTRO = "registro";
 	public final static String REGISTRO_EXITO = "user/registro-exito";
 
 	// ADMINISTRADOR
@@ -20,5 +20,8 @@ public class ViewRouteHelper {
 
 	// EMPLEADO
 	public final static String EMPLEADO_DASHBOARD = "empleado/dashboard";
+	public final static String EMPLEADO_PEDIDOS= "empleado/lista-pedidos";
+	public final static String EMPLEADO_NUEVOPEDIDO= "empleado/cargar-pedido";
+	
 
 }

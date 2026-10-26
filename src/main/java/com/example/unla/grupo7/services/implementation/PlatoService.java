@@ -163,4 +163,7 @@ public class PlatoService implements IPlatoService {
     private PlatoDTO toDTO(Plato p) {
         return new PlatoDTO(p.getId(), p.getNombre(), p.getPrecioVenta(), p.getCostoProduccion());
     }
+
+    
+    
 }
