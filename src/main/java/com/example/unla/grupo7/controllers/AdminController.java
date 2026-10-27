@@ -74,7 +74,7 @@ public class AdminController {
         try {
             CredencialesGeneradasDTO credenciales = registroService.registrar(registro);
             redirectAttrs.addFlashAttribute("credenciales", credenciales);
-            return new ModelAndView("redirect:/registro/exito");
+            return new ModelAndView("redirect:/admin/exito");
         } catch (IllegalArgumentException ex) {
             ModelAndView mAV = new ModelAndView(ViewRouteHelper.REGISTRO);
             mAV.addObject("registro", registro);
