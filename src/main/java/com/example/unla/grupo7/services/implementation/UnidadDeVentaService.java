@@ -44,7 +44,6 @@ public class UnidadDeVentaService implements IUnidadDeVentaService{
                 );
     }
 
-    // Calcula el canon que debe pagar una unidad de venta
     public double calcularCanon(UnidadDeVenta unidad) {
 
         double canon = unidad.getSuperficie() * 500;

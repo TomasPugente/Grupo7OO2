@@ -30,10 +30,16 @@
     </div>
 
     <div class="fila">
-        <div class="panel"><div class="dato"><small >Recaudación total</small><strong th:text="${unidad.recaudacion}">$ 1.250.000</strong></div></div>
-<!--         <div class="panel"><div class="dato"><small>Canon</small><strong>$ 11.000</strong></div></div>
- -->    <div class="panel"><div class="dato"><small>Rentabilidad neta</small><strong>$ 640.000</strong></div></div>
-        <div class="panel"><div class="dato"><small>Empleados activos</small><strong>6</strong></div></div>
+        <div class="panel"><div class="dato"><small>Recaudación total</small>
+        <strong th:text="'$ ' + ${#numbers.formatDecimal(unidad.recaudacion, 1, 'POINT', 2, 'COMMA')}"></strong></div></div>
+<div class="panel">
+    <div class="dato">
+        <small>Canon</small>
+        <strong th:text="'$ ' + ${#numbers.formatDecimal(canon, 1, 'POINT', 2, 'COMMA')}"></strong>
+    </div>
+    </div>        
+        <div class="panel"><div class="dato"><small>Rentabilidad neta</small><strong>$ 640.000</strong></div></div>
+        <div class="panel"><div class="dato"><small>Patente</small><strong></strong></div></div>
     </div>
 
 <!--     <div class="panel">
