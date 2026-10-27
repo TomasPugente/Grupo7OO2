@@ -45,6 +45,11 @@ public class PedidoService implements IPedidoService {
         return pedidoRepository.findByUnidadDeVenta_IdUnidadDeVenta(unidad.getIdUnidadDeVenta());
     }
 
+    public List<Pedido> traerUltimos5Pedidos(String username){
+        UnidadDeVenta unidad = unidadDelUsuario(username);
+            return pedidoRepository.findFirst5ByUnidadDeVenta_IdUnidadDeVentaOrderByFechaTransaccion(unidad.getIdUnidadDeVenta());
+    }
+
     public Pedido crear(PedidoFormDTO form, UnidadDeVenta unidad) {
 
         Map<Long, Integer> cantidades = new LinkedHashMap<>();
@@ -83,7 +88,7 @@ public class PedidoService implements IPedidoService {
 
             total = total.add(plato.getPrecioVenta().multiply(BigDecimal.valueOf(e.getValue())));
         }
-
+        pedido.setEstado("En preparación");
         pedido.setPrecioTotal(total);
 
         pedidoRepository.save(pedido);

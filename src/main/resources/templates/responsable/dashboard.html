@@ -39,7 +39,6 @@
     </div>
     </div>        
         <div class="panel"><div class="dato"><small>Rentabilidad neta</small><strong>$ 640.000</strong></div></div>
-        <div class="panel"><div class="dato"><small>Patente</small><strong></strong></div></div>
     </div>
 
 <!--     <div class="panel">
@@ -50,11 +49,14 @@
     <div class="panel tabla-wrap">
         <h2>Últimos pedidos</h2>
         <table>
-            <thead><tr><th>Fecha</th><th>Plato</th><th class="num">Cantidad</th><th class="num">Total</th></tr></thead>
+            <thead><tr><th>Fecha</th><th>Estado</th><th class="num">Total</th></tr></thead>
             <tbody>
-                <tr><td>12/07/2026</td><td>Brownie con helado</td><td class="num">3</td><td class="num">$ 13.500</td></tr>
-                <tr><td>12/07/2026</td><td>Churros rellenos</td><td class="num">2</td><td class="num">$ 6.400</td></tr>
-                <tr><td>11/07/2026</td><td>Brownie con helado</td><td class="num">5</td><td class="num">$ 22.500</td></tr>
+                <tr th:each="pedido : ${pedidos}">
+                    <td th:text="${pedido.fechaTransaccion}"></td>
+                    <td th:text="${pedido.estado}"></td>
+                    <td class="num" th:text="${pedido.precioTotal}"></td>
+                </tr>
+
             </tbody>
         </table>
     </div>
