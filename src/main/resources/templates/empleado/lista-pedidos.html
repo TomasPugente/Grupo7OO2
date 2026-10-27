@@ -17,12 +17,16 @@
             <thead>
                 <tr>
                     <th>Fecha del pedido</th>
+                    <th>Estado del pedido</th>
                     <th class="num">Costo total</th>
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="pedido : ${pedidos}">
+                <tr th:each="pedido : ${pedidos}" 
+                th:attr="onclick=|window.location.href='@{/empleado/pedidos/nuevo}'|" 
+                style="cursor:pointer;">
                     <td th:text="${pedido.fechaTransaccion}"></td>
+                    <td th:text="${pedido.estado}"></td>
                     <td class="num" th:text="${pedido.precioTotal}"></td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(pedidos)}">

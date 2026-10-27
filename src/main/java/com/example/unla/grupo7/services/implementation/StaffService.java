@@ -155,11 +155,20 @@ public class StaffService implements IStaffService {
         // El sueldo no se asigna: queda null inicialmente.
         staffRepository.save(staff);
 
-        emailService.enviarCredenciales(
-            email,
-            user.getUsername(),
-            passwordEnClaro
-        );
+        try {
+            emailService.enviarCredenciales(
+                email,
+                user.getUsername(),
+                passwordEnClaro
+            );
+        } catch (Exception ex) {
+            // Si falla el envío (p.ej. SMTP TLS roto en dev), logeamos las
+            // credenciales en vez de hacer rollback de todo el alta.
+            System.out.println("[StaffService] No se pudo enviar el mail de credenciales. "
+                + "Causa: " + ex.getMessage()
+                + " | Usuario: " + user.getUsername()
+                + " | Contraseña temporal: " + passwordEnClaro);
+        }
     }
 
 

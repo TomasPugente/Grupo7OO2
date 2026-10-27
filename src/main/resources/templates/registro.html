@@ -9,7 +9,7 @@
 
 <div class="alerta error" th:if="${error != null}" th:text="${error}"></div>
 
-<form method="post" th:action="@{/registro}" th:object="${registro}">
+<form method="post" th:action="@{/admin/registrarunidad}" th:object="${registro}">
 <div class="alerta error" th:if="${#fields.hasErrors('*')}">
   <strong>Revisá los siguientes datos:</strong>
   <ul>

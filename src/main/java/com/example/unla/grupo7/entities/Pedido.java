@@ -32,6 +32,8 @@ public class Pedido {
     
     private BigDecimal precioTotal;
 
+    private String estado;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidad_de_venta_id")
     private UnidadDeVenta unidadDeVenta;

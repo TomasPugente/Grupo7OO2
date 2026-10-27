@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.unla.grupo7.dtos.PedidosDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
 import com.example.unla.grupo7.dtos.PlatoFiltroDTO;
 import com.example.unla.grupo7.dtos.RentabilidadDTO;
@@ -24,13 +25,15 @@ import com.example.unla.grupo7.entities.Staff;
 import com.example.unla.grupo7.entities.UnidadDeVenta;
 import com.example.unla.grupo7.helper.ViewRouteHelper;
 import com.example.unla.grupo7.repositories.IUnidadDeVentaRepository;
-import com.example.unla.grupo7.services.IFestivalService;
+import com.example.unla.grupo7.services.ICostosService;
+import com.example.unla.grupo7.services.IPedidoService;
 import com.example.unla.grupo7.services.IPlatoService;
 import com.example.unla.grupo7.services.IRentabilidadService;
 import com.example.unla.grupo7.services.IStaffService;
 import com.example.unla.grupo7.services.IUnidadDeVentaService;
 import com.example.unla.grupo7.entities.Cajero;
 import com.example.unla.grupo7.entities.Cocinero;
+import com.example.unla.grupo7.entities.Pedido;
 
 import jakarta.validation.Valid;
 
@@ -39,22 +42,31 @@ import jakarta.validation.Valid;
 @PreAuthorize ("hasRole('RESPONSABLE')")
 
 public class ResponsableController {
-    
+
     private final IStaffService staffService;
     private final IUnidadDeVentaRepository unidadRepository;
     private final IPlatoService platoService;
     private final IUnidadDeVentaService unidadService;
     private final IRentabilidadService rentabilidadService;
+    private final ICostosService costosService;
+    private final IPedidoService pedidoService;
 
     public ResponsableController(
             IStaffService staffService,
-            IUnidadDeVentaRepository unidadRepository, IPlatoService platoService,  IUnidadDeVentaService unidadService,
-            IRentabilidadService rentabilidadService) {
+            IUnidadDeVentaRepository unidadRepository,
+            IPlatoService platoService,
+            IUnidadDeVentaService unidadService,
+            IRentabilidadService rentabilidadService,
+            ICostosService costosService,
+            IPedidoService pedidoService) {
+
         this.staffService = staffService;
         this.unidadRepository = unidadRepository;
-        this.platoService= platoService;
-        this.unidadService= unidadService;
+        this.platoService = platoService;
+        this.unidadService = unidadService;
         this.rentabilidadService = rentabilidadService;
+        this.costosService = costosService;
+        this.pedidoService = pedidoService;
     }
 
     // RENTABILIDAD (CU-15 total / CU-16 entre fechas)
@@ -105,8 +117,13 @@ public class ResponsableController {
         String username = authentication.getName();   // el usuario con el que inició sesión
         UnidadDeVenta unidad = unidadService.buscarUnidadPorResponsableUsername(username);
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.RESPONSABLE_DASHBOARD);
+        BigDecimal canon= costosService.calcularCanon(unidad);
+        List<Pedido> pedidos= pedidoService.traerUltimos5Pedidos(username);
         mAV.addObject("unidad", unidad);
         mAV.addObject("festival", unidad.getFestival());
+        mAV.addObject("canon", canon);
+        mAV.addObject("pedidos", pedidos);
+        mAV.addObject("pedido", new PedidosDTO());
         return mAV;
     }
 
