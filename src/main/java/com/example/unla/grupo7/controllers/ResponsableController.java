@@ -1,7 +1,10 @@
 package com.example.unla.grupo7.controllers;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.math.BigDecimal;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -15,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.unla.grupo7.dtos.PedidosDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
 import com.example.unla.grupo7.dtos.PlatoFiltroDTO;
+import com.example.unla.grupo7.dtos.RentabilidadDTO;
 import com.example.unla.grupo7.dtos.StaffDTO;
 import com.example.unla.grupo7.dtos.StaffFormDTO;
 import com.example.unla.grupo7.entities.Staff;
@@ -24,6 +28,7 @@ import com.example.unla.grupo7.repositories.IUnidadDeVentaRepository;
 import com.example.unla.grupo7.services.ICostosService;
 import com.example.unla.grupo7.services.IPedidoService;
 import com.example.unla.grupo7.services.IPlatoService;
+import com.example.unla.grupo7.services.IRentabilidadService;
 import com.example.unla.grupo7.services.IStaffService;
 import com.example.unla.grupo7.services.IUnidadDeVentaService;
 import com.example.unla.grupo7.entities.Cajero;
@@ -37,23 +42,72 @@ import jakarta.validation.Valid;
 @PreAuthorize ("hasRole('RESPONSABLE')")
 
 public class ResponsableController {
-    
+
     private final IStaffService staffService;
     private final IUnidadDeVentaRepository unidadRepository;
     private final IPlatoService platoService;
     private final IUnidadDeVentaService unidadService;
+    private final IRentabilidadService rentabilidadService;
     private final ICostosService costosService;
     private final IPedidoService pedidoService;
 
     public ResponsableController(
             IStaffService staffService,
-            IUnidadDeVentaRepository unidadRepository, IPlatoService platoService,  IUnidadDeVentaService unidadService, ICostosService costosService, IPedidoService pedidoService) {
+            IUnidadDeVentaRepository unidadRepository,
+            IPlatoService platoService,
+            IUnidadDeVentaService unidadService,
+            IRentabilidadService rentabilidadService,
+            ICostosService costosService,
+            IPedidoService pedidoService) {
+
         this.staffService = staffService;
         this.unidadRepository = unidadRepository;
-        this.platoService= platoService;
-        this.unidadService= unidadService;
-        this.costosService= costosService;
-        this.pedidoService=pedidoService;
+        this.platoService = platoService;
+        this.unidadService = unidadService;
+        this.rentabilidadService = rentabilidadService;
+        this.costosService = costosService;
+        this.pedidoService = pedidoService;
+    }
+
+    // RENTABILIDAD (CU-15 total / CU-16 entre fechas)
+
+    @GetMapping("/reportes")
+    public ModelAndView rentabilidad(
+            Authentication authentication,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
+
+        UnidadDeVenta unidad =
+                unidadService.buscarUnidadPorResponsableUsername(authentication.getName());
+
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.RESPONSABLE_RENTABILIDAD);
+        mAV.addObject("desde", desde);
+        mAV.addObject("hasta", hasta);
+
+        boolean hayAlgunaFecha = desde != null || hasta != null;
+        boolean hayAmbasFechas = desde != null && hasta != null;
+
+        if (hayAlgunaFecha && !hayAmbasFechas) {
+            mAV.addObject("error", "Completá ambas fechas para filtrar.");
+            mAV.addObject("rentabilidad",
+                    rentabilidadService.calcularPorUnidad(unidad.getIdUnidadDeVenta()));
+            return mAV;
+        }
+
+        try {
+            RentabilidadDTO rentabilidad = hayAmbasFechas
+                    ? rentabilidadService.calcularPorUnidadEntreFechas(
+                            unidad.getIdUnidadDeVenta(), desde, hasta)
+                    : rentabilidadService.calcularPorUnidad(unidad.getIdUnidadDeVenta());
+            mAV.addObject("rentabilidad", rentabilidad);
+        } catch (IllegalArgumentException ex) {
+            mAV.addObject("error", ex.getMessage());
+            mAV.addObject("rentabilidad",
+                    rentabilidadService.calcularPorUnidad(unidad.getIdUnidadDeVenta()));
+        }
+        return mAV;
     }
 
     // DASHBOARD
@@ -332,7 +386,7 @@ public class ResponsableController {
         return ViewRouteHelper.VISTA_FORM;
     }
 
-    @PostMapping("")
+    @PostMapping("/platos")
     public String crear(@Valid @ModelAttribute("plato") PlatoDTO plato,
                         BindingResult result,
                         Authentication authentication,

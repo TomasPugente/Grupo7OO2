@@ -8,4 +8,5 @@ public interface IUnidadDeVentaService {
 
     public UnidadDeVenta buscarUnidadPorStaffUsername(String username);
 
+    double calcularCanon(UnidadDeVenta unidad);
 }
