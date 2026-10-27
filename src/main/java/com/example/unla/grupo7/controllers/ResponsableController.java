@@ -107,6 +107,8 @@ public class ResponsableController {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.RESPONSABLE_DASHBOARD);
         mAV.addObject("unidad", unidad);
         mAV.addObject("festival", unidad.getFestival());
+        mAV.addObject("platoEstrella",
+                platoService.obtenerPlatoEstrella(username).orElse(null));
         return mAV;
     }
 

@@ -36,10 +36,15 @@
         <div class="panel"><div class="dato"><small>Empleados activos</small><strong>6</strong></div></div>
     </div>
 
-<!--     <div class="panel">
+    <div class="panel">
         <h2>Plato estrella</h2>
-        <p><strong>Brownie con helado</strong> <span class="etiqueta">320 pedidos</span></p>
-    </div> -->
+        <p th:if="${platoEstrella != null}">
+            <strong th:text="${platoEstrella.plato.nombre}">Brownie con helado</strong>
+            <span class="etiqueta"
+                  th:text="${platoEstrella.cantidadVendida} + ' unidades vendidas'">320 unidades vendidas</span>
+        </p>
+        <p th:unless="${platoEstrella != null}">Todavía no hay ventas registradas.</p>
+    </div>
 
     <div class="panel tabla-wrap">
         <h2>Últimos pedidos</h2>
