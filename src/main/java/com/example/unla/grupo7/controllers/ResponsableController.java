@@ -1,6 +1,7 @@
 package com.example.unla.grupo7.controllers;
 
 import java.util.List;
+import java.math.BigDecimal;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -66,18 +67,69 @@ public class ResponsableController {
     // VER EMPLEADOS
 
     @GetMapping("/empleados")
-    public ModelAndView empleados() {
-        ModelAndView mAV= new ModelAndView("empleado/lista");
-        mAV.addObject("empleados", staffService.listarActivos());
+    public ModelAndView empleados(
+        Authentication authentication,
+        @RequestParam(required = false) String nombre,
+        @RequestParam(required = false) String apellido,
+        @RequestParam(required = false) String dni,
+        @RequestParam(required = false) BigDecimal sueldoMinimo,
+        @RequestParam(required = false) BigDecimal sueldoMaximo,
+        @RequestParam(required = false) String turno,
+        @RequestParam(required = false) String especialidad) {
+
+        String username = authentication.getName();
+
+        UnidadDeVenta unidad =
+            unidadService.buscarUnidadPorResponsableUsername(username);
+
+        ModelAndView mAV = new ModelAndView("empleado/lista");
+
+        List<Staff> empleados =
+            staffService.filtrarActivosPorUnidad(
+                unidad.getIdUnidadDeVenta(),
+                nombre,
+                apellido,
+                dni,
+                sueldoMinimo,
+                sueldoMaximo,
+                turno,
+                especialidad
+            );
+
+        mAV.addObject("empleados", empleados);
         mAV.addObject("empleado", new StaffDTO());
+
+        // Conservamos los valores ingresados en los filtros.
+        mAV.addObject("nombre", nombre);
+        mAV.addObject("apellido", apellido);
+        mAV.addObject("dni", dni);
+        mAV.addObject("sueldoMinimo", sueldoMinimo);
+        mAV.addObject("sueldoMaximo", sueldoMaximo);
+        mAV.addObject("turno", turno);
+        mAV.addObject("especialidad", especialidad);
+
         return mAV;
     }
-
+    
     @GetMapping("/inactivos")
-    public String listarInactivos(Model model) {
-        model.addAttribute("empleados", staffService.listarInactivos());
+    public String listarInactivos(
+        Authentication authentication,
+        Model model) {
+
+        String username = authentication.getName();
+
+        UnidadDeVenta unidad =
+            unidadService.buscarUnidadPorResponsableUsername(username);
+
+        model.addAttribute(
+            "empleados",
+            staffService.listarInactivosPorUnidad(
+                    unidad.getIdUnidadDeVenta())
+        );
+
         return "empleado/inactivos";
     }
+
 
     @GetMapping("/empleados/nuevo")
     public String nuevoStaff(Model model) {
@@ -86,32 +138,50 @@ public class ResponsableController {
         return "empleado/formulario";
     }
 
+    
     @PostMapping("/empleados/nuevo")
     public String alta(
-            @Valid @ModelAttribute("staffForm") StaffFormDTO dto,
-            BindingResult result,
-            Model model,
-            RedirectAttributes redirectAttrs) {
+        @Valid @ModelAttribute("staffForm") StaffFormDTO dto,
+        BindingResult result,
+        Authentication authentication,
+        Model model,
+        RedirectAttributes redirectAttrs) {
+
+        // Obtener la unidad del Responsable autenticado
+        String username = authentication.getName();
+
+        UnidadDeVenta unidad =
+            unidadService.buscarUnidadPorResponsableUsername(username);
+
+        // Asignar automáticamente la unidad correspondiente
+        dto.setUnidadDeVentaId(unidad.getIdUnidadDeVenta());
 
         if (result.hasErrors()) {
-            cargarUnidades(model);
+            model.addAttribute("idUnidadResponsable",
+                unidad.getIdUnidadDeVenta());
             return "empleado/formulario";
         }
 
         try {
             staffService.alta(dto);
+            
             redirectAttrs.addFlashAttribute(
                 "mensaje",
-                "Empleado creado. Se enviaron las credenciales por correo."
+                "Empleado creado correctamente en tu unidad de venta."
             );
-            return "redirect:/empleado";
+
+            return "redirect:/responsable/empleados";
 
         } catch (IllegalArgumentException ex) {
             model.addAttribute("error", ex.getMessage());
-            cargarUnidades(model);
+            model.addAttribute(
+                "idUnidadResponsable",
+                unidad.getIdUnidadDeVenta()
+            );
             return "empleado/formulario";
         }
     }
+
 
     @GetMapping("/empleados/{id}/editar")
     public String editar(@PathVariable long id, Model model) {
@@ -119,12 +189,14 @@ public class ResponsableController {
         Staff staff = staffService.buscarPorId(id);
 
         StaffFormDTO dto = new StaffFormDTO();
-        if (staff instanceof Cajero) {
+        if (staff instanceof Cajero cajero) {
             dto.setTipoEmpleado("Cajero");
+            dto.setTurno(cajero.getTurno());
         } else if (staff instanceof Cocinero cocinero) {
             dto.setTipoEmpleado("Cocinero");
             dto.setEspecialidad(cocinero.getEspecialidad());
         }
+
         dto.setNombre(staff.getNombre());
         dto.setApellido(staff.getApellido());
         dto.setDni(staff.getDni());
@@ -164,7 +236,7 @@ public class ResponsableController {
             redirectAttrs.addFlashAttribute(
                 "mensaje", "Empleado modificado correctamente."
             );
-            return "redirect:/empleado";
+            return "redirect:/responsable/empleados";
 
         } catch (IllegalArgumentException ex) {
             model.addAttribute("idEmpleado", id);
@@ -185,7 +257,7 @@ public class ResponsableController {
             "mensaje", "Empleado dado de baja correctamente."
         );
 
-        return "redirect:/empleado";
+        return "redirect:/responsable/empleados";
     }
 
     @PostMapping("/empleados/{id}/reactivar")
@@ -199,7 +271,7 @@ public class ResponsableController {
             "mensaje", "Empleado reactivado correctamente."
         );
 
-        return "redirect:/empleado/inactivos";
+        return "redirect:/responsable/inactivos";
     }
 
     private void cargarUnidades(Model model) {

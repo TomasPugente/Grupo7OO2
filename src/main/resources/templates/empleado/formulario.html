@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Formulario de empleado')}"></head>
@@ -17,12 +16,13 @@
         Se generará una contraseña automáticamente y se enviará
         al email ingresado.
     </p>
-
+   
     <form th:object="${staffForm}"
-          th:action="${idEmpleado != null}
-              ? @{/empleado/{id}/editar(id=${idEmpleado})}
-              : @{/empleado}"
-          method="post">
+        th:action="${idEmpleado != null}
+          ? @{/responsable/empleados/{id}/editar(id=${idEmpleado})}
+          : @{/responsable/empleados/nuevo}"
+      method="post">
+
 
         <div>
             <label for="nombre">Nombre</label>
@@ -37,12 +37,22 @@
             <p th:if="${#fields.hasErrors('apellido')}"
                th:errors="*{apellido}"></p>
         </div>
-
+  
         <div>
             <label for="dni">DNI</label>
-            <input id="dni" type="number" th:field="*{dni}" min="1" required>
+
+            <input id="dni"
+                type="text"
+                th:field="*{dni}"
+                inputmode="numeric"
+                pattern="[0-9]{8}"
+                maxlength="8"
+                minlength="8"
+                title="Ingresá exactamente 8 números."
+                required>
+
             <p th:if="${#fields.hasErrors('dni')}"
-               th:errors="*{dni}"></p>
+                th:errors="*{dni}"></p>
         </div>
 
         <div>
@@ -51,14 +61,6 @@
                    th:field="*{fechaNacimiento}" required>
             <p th:if="${#fields.hasErrors('fechaNacimiento')}"
                th:errors="*{fechaNacimiento}"></p>
-        </div>
-
-        <div>
-            <label for="fechaIngreso">Fecha de ingreso</label>
-            <input id="fechaIngreso" type="date"
-                   th:field="*{fechaIngreso}" required>
-            <p th:if="${#fields.hasErrors('fechaIngreso')}"
-               th:errors="*{fechaIngreso}"></p>
         </div>
 
         <div>
@@ -84,6 +86,20 @@
                    th:if="${idEmpleado != null}"
                    th:field="*{tipoEmpleado}">
         </div>
+        
+        <div id="campoTurno">
+            <label for="turno">Turno de trabajo</label>
+
+            <select id="turno" th:field="*{turno}">
+                <option value="">Seleccione un turno</option>
+                <option value="Mañana">Mañana</option>
+                <option value="Tarde">Tarde</option>
+                <option value="Noche">Noche</option>
+            </select>
+
+            <p th:if="${#fields.hasErrors('turno')}"
+                th:errors="*{turno}"></p>
+        </div>
 
         <div id="campoEspecialidad">
             <label for="especialidad">Especialidad del cocinero</label>
@@ -93,22 +109,13 @@
                    maxlength="100">
         </div>
 
-        <div>
-            <label for="unidadDeVentaId">Unidad de venta</label>
-            <select id="unidadDeVentaId" th:field="*{unidadDeVentaId}">
-                <option value="">Sin asignar</option>
-                <option th:each="unidad : ${unidades}"
-                        th:value="${unidad.idUnidadDeVenta}"
-                        th:text="${unidad.nombreComercial}">
-                </option>
-            </select>
-        </div>
-
         <p>El sueldo no se carga en este formulario.</p>
 
         <div class="acciones">
             <button class="btn" type="submit">Guardar</button>
-            <a class="btn secundario" th:href="@{/empleado}">Cancelar</a>
+            <a th:href="@{/responsable/empleados}" class="btn secundario">
+                Cancelar
+            </a>
         </div>
     </form>
 </main>
@@ -118,23 +125,45 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const tipo = document.getElementById("tipoEmpleado");
-    const campoEspecialidad = document.getElementById("campoEspecialidad");
-    const especialidad = document.getElementById("especialidad");
 
-    function actualizarEspecialidad() {
+    const campoEspecialidad =
+        document.getElementById("campoEspecialidad");
+    const especialidad =
+        document.getElementById("especialidad");
+
+    const campoTurno =
+        document.getElementById("campoTurno");
+    const turno =
+        document.getElementById("turno");
+
+    function actualizarCampos() {
         const esCocinero = tipo.value === "Cocinero";
+        const esCajero = tipo.value === "Cajero";
 
-        campoEspecialidad.style.display = esCocinero ? "" : "none";
+        campoEspecialidad.style.display =
+            esCocinero ? "" : "none";
+
         especialidad.required = esCocinero;
+
+        campoTurno.style.display =
+            esCajero ? "" : "none";
+
+        turno.required = esCajero;
 
         if (!esCocinero) {
             especialidad.value = "";
         }
+
+        if (!esCajero) {
+            turno.value = "";
+        }
     }
 
-    tipo.addEventListener("change", actualizarEspecialidad);
-    actualizarEspecialidad();
+    tipo.addEventListener("change", actualizarCampos);
+
+    actualizarCampos();
 });
+
 </script>
 
 </body>

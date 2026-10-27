@@ -26,4 +26,9 @@ public interface IStaffRepository extends JpaRepository<Staff, Long> {
     List<Staff> findByActivoTrue();
 
     List<Staff> findByActivoFalse();
+
+    List<Staff> findByUnidadDeVenta_IdUnidadDeVentaAndActivoTrue(Long idUnidadDeVenta);
+
+    List<Staff> findByUnidadDeVenta_IdUnidadDeVentaAndActivoFalse(Long idUnidadDeVenta);
+
 }

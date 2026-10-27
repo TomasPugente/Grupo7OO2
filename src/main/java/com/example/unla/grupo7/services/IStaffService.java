@@ -22,4 +22,20 @@ public interface IStaffService {
     void bajaLogica(long id);
 
     void reactivar(long id);
+
+    List<Staff> listarActivosPorUnidad(Long idUnidadDeVenta);
+
+    List<Staff> listarInactivosPorUnidad(Long idUnidadDeVenta);
+
+    List<Staff> filtrarActivosPorUnidad(
+        Long idUnidadDeVenta,
+        String nombre,
+        String apellido,
+        String dni,
+        java.math.BigDecimal sueldoMinimo,
+        java.math.BigDecimal sueldoMaximo,
+        String turno,
+        String especialidad
+    );
+
 }

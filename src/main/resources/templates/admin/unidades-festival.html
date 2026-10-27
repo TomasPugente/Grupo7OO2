@@ -30,20 +30,21 @@
         <div class="fila-ordenamiento">
             <h2>Listado de unidades</h2>
 
+           
             <div class="acciones">
 
                 <a class="btn secundario"
-                    th:href="@{/festivales/{id}/unidades(id=${idFestival}, orden=${siguienteOrden})}"
+                    th:href="@{/admin/{id}/unidades(id=${idFestival}, orden=${siguienteOrden})}"
                     th:text="${textoBoton}">
                 </a>
 
                 <a class="btn secundario"
                     th:if="${mostrarRestablecer}"
-                    th:href="@{/festivales/{id}/unidades(id=${idFestival}, orden='original')}">
+                    th:href="@{/admin/{id}/unidades(id=${idFestival}, orden='original')}">
                     Restablecer orden original
                 </a>
-
             </div>
+
         </div>
 
 
@@ -92,7 +93,7 @@
                 Volver a festivales
             </a>
 
-            <a class="btn" th:href="@{/registro}">
+            <a class="btn" th:href="@{/admin/registrarunidad}">
                 Registrar unidad de venta
             </a>
 

@@ -10,14 +10,122 @@
     <p th:if="${mensaje}" th:text="${mensaje}"></p>
     <p th:if="${error}" th:text="${error}"></p>
 
-    <div class="acciones">
-        <a class="btn" th:href="@{/empleado/nuevo}">
-            Agregar empleado
+    <div class="acciones acciones-empleados">
+
+        <!-- Botón desplegable de filtros -->
+        <details class="filtros-dropdown">
+            <summary class="btn secundario">Filtros</summary>
+
+            <form th:action="@{/responsable/empleados}"
+              method="get"
+              class="panel-filtros">
+
+                <h3>Filtrar empleados</h3>
+
+                
+                <div class="campo">
+                    <label for="nombre">Nombre</label>
+                    <input type="text"
+                        id="nombre"
+                        name="nombre"
+                        placeholder="Ingresá el nombre"
+                        th:value="${nombre}">
+                </div>
+
+                <div class="campo">
+                    <label for="apellido">Apellido</label>
+                    <input type="text"
+                        id="apellido"
+                        name="apellido"
+                        placeholder="Ingresá el apellido"
+                        th:value="${apellido}">
+                </div>
+
+                <div class="campo">
+                    <label for="dni">DNI</label>
+                    <input type="text"
+                       id="dni"
+                       name="dni"
+                       inputmode="numeric"
+                       pattern="[0-9]*"
+                       placeholder="Parte del DNI"
+                       th:value="${dni}">
+                </div>
+
+                <div class="campo">
+                    <label for="sueldoMinimo">Sueldo mínimo</label>
+                    <input type="number"
+                       id="sueldoMinimo"
+                       name="sueldoMinimo"
+                       min="0"
+                       step="0.01"
+                       placeholder="Sin mínimo"
+                       th:value="${sueldoMinimo}">
+                </div>
+
+                <div class="campo">
+                    <label for="sueldoMaximo">Sueldo máximo</label>
+                    <input type="number"
+                       id="sueldoMaximo"
+                       name="sueldoMaximo"
+                       min="0"
+                       step="0.01"
+                       placeholder="Sin máximo"
+                       th:value="${sueldoMaximo}">
+                </div>
+
+                <div class="campo">
+                    <label for="turno">Turno (Cajeros)</label>
+                    <select id="turno" name="turno">
+                        <option value="">Todos los turnos</option>
+                        <option value="Mañana"
+                            th:selected="${turno == 'Mañana'}">
+                            Mañana
+                        </option>
+                        <option value="Tarde"
+                            th:selected="${turno == 'Tarde'}">
+                            Tarde
+                        </option>
+                        <option value="Noche"
+                            th:selected="${turno == 'Noche'}">
+                            Noche
+                        </option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="especialidad">Especialidad (Cocineros)</label>
+                    <input type="text"
+                       id="especialidad"
+                       name="especialidad"
+                       placeholder="Especialidad"
+                       th:value="${especialidad}">
+                </div>
+
+                <div class="acciones">
+                    <button type="submit" class="btn">
+                        Aplicar
+                    </button>
+
+                    <a class="btn secundario"
+                       th:href="@{/responsable/empleados}">
+                        Limpiar
+                    </a>
+                </div>
+        
+            </form>
+        </details>
+
+        <a class="btn"
+            th:href="@{/responsable/empleados/nuevo}">
+                Agregar empleado
         </a>
 
-        <a class="btn secundario" th:href="@{/empleado/inactivos}">
-            Ver empleados dados de baja
+        <a class="btn secundario"
+            th:href="@{/responsable/inactivos}">
+                Ver empleados dados de baja
         </a>
+
     </div>
 
     <div class="tabla-wrap">
@@ -48,15 +156,15 @@
                     </td>
 
                     <td>
-                        <div class="acciones">
+                        <div class="acciones">                            
                             <a class="btn secundario"
-                               th:href="@{/empleado/{id}/editar(id=${empleado.id})}">
+                                th:href="@{/responsable/empleados/{id}/editar(id=${empleado.id})}">
                                 Modificar
                             </a>
 
-                            <form th:action="@{/empleado/{id}/eliminar(id=${empleado.id})}"
-                                  method="post"
-                                  onsubmit="return confirm('¿Dar de baja a este empleado?');">
+                            <form   th:action="@{/responsable/empleados/{id}/eliminar(id=${empleado.id})}"
+                                    method="post"
+                                    onsubmit="return confirm('¿Dar de baja a este empleado?');">
 
                                 <button class="btn secundario" type="submit">
                                     Dar de baja
