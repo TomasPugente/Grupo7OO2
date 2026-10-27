@@ -340,7 +340,7 @@ public class ResponsableController {
         return ViewRouteHelper.VISTA_FORM;
     }
 
-    @PostMapping("")
+    @PostMapping("/platos")
     public String crear(@Valid @ModelAttribute("plato") PlatoDTO plato,
                         BindingResult result,
                         Authentication authentication,
