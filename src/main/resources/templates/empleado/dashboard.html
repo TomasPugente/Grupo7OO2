@@ -20,13 +20,26 @@
         </form>
     </div>
 
-    <div class="panel">
+    <div class="panel" th:if="${trabajaHoy}">
         <h2>Hoy trabajás en</h2>
         <div class="fila">
             <div class="dato"><small>Festival</small><strong th:text="${festival.nombre}"></strong></div>
             <div class="dato"><small>Unidad de venta</small><strong th:text="${unidad.nombreComercial}"></strong></div>
             <div class="dato"><small>Período</small><strong th:text="${festival.fechaInicio} + ' al ' + ${festival.fechaFin}"></strong></div>
         </div>
+    </div>
+
+    <div class="panel" th:unless="${trabajaHoy}">
+        <h2>Cronograma</h2>
+        <p th:if="${!staff.activo}">Tu usuario no está activo. No tenés turnos asignados.</p>
+        <p th:if="${staff.activo and (unidad == null or festival == null)}">
+            Todavía no tenés una unidad asignada en un festival.
+        </p>
+        <p th:if="${staff.activo and festival != null and (not festival.activo or hoy.isBefore(festival.fechaInicio) or hoy.isAfter(festival.fechaFin))}">
+            Hoy (<span th:text="${hoy}"></span>) no te toca trabajar. Tu festival asignado es
+            <strong th:text="${festival.nombre}"></strong>
+            (<span th:text="${festival.fechaInicio} + ' al ' + ${festival.fechaFin}"></span>).
+        </p>
     </div>
 
     <div class="fila">

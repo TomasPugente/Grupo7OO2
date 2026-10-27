@@ -1,5 +1,6 @@
 package com.example.unla.grupo7.controllers;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.security.core.Authentication;
@@ -15,8 +16,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.unla.grupo7.dtos.PedidoFormDTO;
 import com.example.unla.grupo7.dtos.PedidosDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
+import com.example.unla.grupo7.entities.Festival;
 import com.example.unla.grupo7.entities.Pedido;
 import com.example.unla.grupo7.entities.Staff;
+import com.example.unla.grupo7.entities.UnidadDeVenta;
 import com.example.unla.grupo7.helper.ViewRouteHelper;
 import com.example.unla.grupo7.services.IPedidoService;
 import com.example.unla.grupo7.services.IPlatoService;
@@ -45,9 +48,26 @@ public class StaffController {
         String username= authentication.getName();
         ModelAndView mAV= new ModelAndView(ViewRouteHelper.EMPLEADO_DASHBOARD);
         Staff staff= staffService.buscarPorNombre(username);
+        UnidadDeVenta unidad = staff.getUnidadDeVenta();
+        Festival festival = unidad != null ? unidad.getFestival() : null;
+
+        // CU-20: Cronograma de trabajo.
+        // Hay que trabajar hoy si el empleado está activo, el festival está activo
+        // y la fecha de hoy cae dentro del rango del festival.
+        LocalDate hoy = LocalDate.now();
+        boolean trabajaHoy = staff.isActivo()
+                && festival != null
+                && festival.isActivo()
+                && festival.getFechaInicio() != null
+                && festival.getFechaFin() != null
+                && !hoy.isBefore(festival.getFechaInicio())
+                && !hoy.isAfter(festival.getFechaFin());
+
         mAV.addObject("staff", staff);
-        mAV.addObject("unidad", staff.getUnidadDeVenta());
-        mAV.addObject("festival", staff.getUnidadDeVenta().getFestival());
+        mAV.addObject("unidad", unidad);
+        mAV.addObject("festival", festival);
+        mAV.addObject("trabajaHoy", trabajaHoy);
+        mAV.addObject("hoy", hoy);
         return mAV;
     }
 
