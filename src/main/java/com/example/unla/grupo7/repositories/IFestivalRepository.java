@@ -8,4 +8,7 @@ import com.example.unla.grupo7.entities.Festival;
 @Repository("festivalRepository")
 public interface IFestivalRepository
         extends JpaRepository<Festival, Long> {
+
+
+                
 }

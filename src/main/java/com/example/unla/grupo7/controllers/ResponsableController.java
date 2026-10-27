@@ -20,7 +20,7 @@ import com.example.unla.grupo7.entities.Staff;
 import com.example.unla.grupo7.entities.UnidadDeVenta;
 import com.example.unla.grupo7.helper.ViewRouteHelper;
 import com.example.unla.grupo7.repositories.IUnidadDeVentaRepository;
-import com.example.unla.grupo7.services.IFestivalService;
+import com.example.unla.grupo7.services.ICostosService;
 import com.example.unla.grupo7.services.IPlatoService;
 import com.example.unla.grupo7.services.IStaffService;
 import com.example.unla.grupo7.services.IUnidadDeVentaService;
@@ -39,14 +39,16 @@ public class ResponsableController {
     private final IUnidadDeVentaRepository unidadRepository;
     private final IPlatoService platoService;
     private final IUnidadDeVentaService unidadService;
+    private final ICostosService costosService;
 
     public ResponsableController(
             IStaffService staffService,
-            IUnidadDeVentaRepository unidadRepository, IPlatoService platoService,  IUnidadDeVentaService unidadService) {
+            IUnidadDeVentaRepository unidadRepository, IPlatoService platoService,  IUnidadDeVentaService unidadService, ICostosService costosService) {
         this.staffService = staffService;
         this.unidadRepository = unidadRepository;
         this.platoService= platoService;
         this.unidadService= unidadService;
+        this.costosService= costosService;
     }
 
     // DASHBOARD
@@ -56,8 +58,10 @@ public class ResponsableController {
         String username = authentication.getName();   // el usuario con el que inició sesión
         UnidadDeVenta unidad = unidadService.buscarUnidadPorResponsableUsername(username);
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.RESPONSABLE_DASHBOARD);
+        BigDecimal canon= costosService.calcularCanon(unidad);
         mAV.addObject("unidad", unidad);
         mAV.addObject("festival", unidad.getFestival());
+        mAV.addObject("canon", canon);
         return mAV;
     }
 
