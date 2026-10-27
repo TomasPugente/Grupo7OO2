@@ -82,3 +82,130 @@ tr:hover td{background:#fafbfa}
 .etiqueta{display:inline-block;background:#eef1ee;border-radius:3px;padding:.1rem .5rem;font-size:.8rem}
 .centrado{text-align:center}
 @media (max-width:600px){.navbar{gap:.75rem}}
+
+
+/* Filtros desplegables de empleados */
+.acciones-empleados {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.filtros-dropdown {
+    position: relative;
+}
+
+/* Botón Filtros */
+.filtros-dropdown > summary {
+    display: inline-block;
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.filtros-dropdown > summary::-webkit-details-marker {
+    display: none;
+}
+
+.filtros-dropdown > summary::after {
+    content: " ▾";
+    font-size: .8rem;
+}
+
+/* Cuadradito desplegable */
+.panel-filtros {
+    position: absolute;
+    top: calc(100% + .5rem);
+    left: 0;
+    z-index: 1000;
+
+    width: 310px;
+    max-width: calc(100vw - 2rem);
+    max-height: 75vh;
+    overflow-y: auto;
+
+    padding: 1rem;
+    margin: 0;
+
+    background: var(--panel);
+    color: var(--tinta);
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    box-shadow: 0 5px 16px rgba(31, 42, 48, .16);
+}
+
+/* Título del panel */
+.panel-filtros h3 {
+    color: var(--primario);
+    font-size: 1.05rem;
+    margin: 0 0 1rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid var(--borde);
+}
+
+/* Campos de búsqueda */
+.panel-filtros .campo {
+    margin-bottom: .75rem;
+}
+
+.panel-filtros label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: .25rem;
+    font-size: .85rem;
+}
+
+.panel-filtros input,
+.panel-filtros select {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: .45rem .55rem;
+    font-size: .9rem;
+    border: 1px solid var(--borde);
+    border-radius: 4px;
+    background: #fff;
+    color: var(--tinta);
+}
+
+.panel-filtros input:focus,
+.panel-filtros select:focus {
+    outline: 2px solid var(--acento);
+    outline-offset: 1px;
+    border-color: var(--primario);
+}
+
+/* Botones Aplicar y Limpiar */
+.panel-filtros .acciones {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.panel-filtros .btn {
+    padding: .4rem .75rem;
+    font-size: .85rem;
+}
+
+.panel-filtros .btn.secundario {
+    background: #fff;
+    color: var(--primario);
+    border: 1px solid var(--primario);
+}
+
+.panel-filtros .btn.secundario:hover {
+    background: #eef3f4;
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 600px) {
+    .panel-filtros {
+        width: min(310px, calc(100vw - 2rem));
+    }
+}
+
+
+

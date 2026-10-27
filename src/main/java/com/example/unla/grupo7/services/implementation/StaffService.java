@@ -1,7 +1,11 @@
 package com.example.unla.grupo7.services.implementation;
 
 import java.security.SecureRandom;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+import java.time.LocalDate;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,7 @@ import com.example.unla.grupo7.repositories.IUserRepository;
 import com.example.unla.grupo7.services.IStaffService;
 import com.example.unla.grupo7.entities.Cajero;
 import com.example.unla.grupo7.entities.Cocinero;
+
 
 @Service
 public class StaffService implements IStaffService {
@@ -85,16 +90,24 @@ public class StaffService implements IStaffService {
         validarEmail(dto.getEmail(), null);
 
         Staff staff;
-
         if ("Cajero".equals(dto.getTipoEmpleado())) {
-            staff = new Cajero();
+
+            if (dto.getTurno() == null || dto.getTurno().isBlank()) {
+                throw new IllegalArgumentException(
+                "Debe seleccionar el turno del cajero.");
+            }
+
+            Cajero cajero = new Cajero();
+            cajero.setTurno(dto.getTurno().trim());
+
+            staff = cajero;
 
         } else if ("Cocinero".equals(dto.getTipoEmpleado())) {
 
             if (dto.getEspecialidad() == null
-                    || dto.getEspecialidad().isBlank()) {
+                || dto.getEspecialidad().isBlank()) {
                 throw new IllegalArgumentException(
-                    "Debe indicar la especialidad del cocinero.");
+                "Debe indicar la especialidad del cocinero.");
             }
 
             Cocinero cocinero = new Cocinero();
@@ -104,8 +117,9 @@ public class StaffService implements IStaffService {
 
         } else {
             throw new IllegalArgumentException(
-                "Debe seleccionar Cajero o Cocinero.");
+            "Debe seleccionar Cajero o Cocinero.");
         }
+
     
 
         String email = normalizarEmail(dto.getEmail());
@@ -124,6 +138,16 @@ public class StaffService implements IStaffService {
         user = userRepository.save(user);
 
         copiarDatos(dto, staff);
+        
+        staff.setFechaIngreso(LocalDate.now());
+
+        UnidadDeVenta unidad = unidadRepository
+            .findById(dto.getUnidadDeVentaId())
+            .orElseThrow(() ->
+                new IllegalArgumentException(
+                    "La unidad de venta seleccionada no existe."));
+
+        staff.setUnidadDeVenta(unidad);
         staff.setEmail(email);
         staff.setActivo(true);
         staff.setUser(user);
@@ -176,6 +200,16 @@ public class StaffService implements IStaffService {
         if (!staff.isActivo()) {
             throw new IllegalArgumentException(
                 "No se puede modificar un empleado dado de baja.");
+        }
+        
+        if (staff instanceof Cajero cajero) {
+
+            if (dto.getTurno() == null || dto.getTurno().isBlank()) {
+                throw new IllegalArgumentException(
+                "Debe seleccionar el turno del cajero.");
+            }
+
+            cajero.setTurno(dto.getTurno().trim());
         }
 
         validarDni(dto.getDni(), id);
@@ -256,19 +290,6 @@ public class StaffService implements IStaffService {
         staff.setApellido(dto.getApellido().trim());
         staff.setDni(dto.getDni());
         staff.setFechaNacimiento(dto.getFechaNacimiento());
-        staff.setFechaIngreso(dto.getFechaIngreso());
-
-        if (dto.getUnidadDeVentaId() == null) {
-            staff.setUnidadDeVenta(null);
-        } else {
-            UnidadDeVenta unidad = unidadRepository
-                .findById(dto.getUnidadDeVentaId())
-                .orElseThrow(() ->
-                    new IllegalArgumentException(
-                        "La unidad de venta seleccionada no existe."));
-
-            staff.setUnidadDeVenta(unidad);
-        }
     }
 
     private void validarDni(int dni, Long idExcluir) {
@@ -328,4 +349,130 @@ public class StaffService implements IStaffService {
 
         return sb.toString();
     }
+
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Staff> listarActivosPorUnidad(Long idUnidadDeVenta) {
+        return staffRepository.findByUnidadDeVenta_IdUnidadDeVentaAndActivoTrue(idUnidadDeVenta);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Staff> filtrarActivosPorUnidad(
+        Long idUnidadDeVenta,
+        String nombre,
+        String apellido,
+        String dni,
+        BigDecimal sueldoMinimo,
+        BigDecimal sueldoMaximo,
+        String turno,
+        String especialidad) {
+
+    // Primero obtenemos solamente los empleados activos
+    // de la unidad del Responsable.
+    List<Staff> empleados =
+        staffRepository
+            .findByUnidadDeVenta_IdUnidadDeVentaAndActivoTrue(
+                idUnidadDeVenta
+            );
+
+    return empleados.stream()
+        .filter(e -> {
+
+           // Filtro opcional por nombre.
+                if (nombre != null && !nombre.isBlank()) {
+                    if (e.getNombre() == null
+                        || !e.getNombre()
+                        .toLowerCase(Locale.ROOT)
+                        .contains(nombre.trim().toLowerCase(Locale.ROOT))) {
+                        return false;
+                    }
+                }
+
+            // Filtro opcional por apellido.
+                if (apellido != null && !apellido.isBlank()) {
+                    if (e.getApellido() == null
+                        || !e.getApellido()
+                        .toLowerCase(Locale.ROOT)
+                        .contains(apellido.trim().toLowerCase(Locale.ROOT))) {
+                        return false;
+                    }
+                }
+
+            // Filtro opcional por DNI parcial.
+                if (dni != null && !dni.isBlank()) {
+                    String dniEmpleado = String.valueOf(e.getDni());
+
+                    if (!dniEmpleado.contains(dni.trim())) {
+                        return false;
+                    }
+                }
+
+            // Filtro opcional por sueldo mínimo.
+            if (sueldoMinimo != null) {
+                if (e.getSueldo() == null
+                        || e.getSueldo()
+                            .compareTo(sueldoMinimo) < 0) {
+                    return false;
+                }
+            }
+
+            // Filtro opcional por sueldo máximo.
+            if (sueldoMaximo != null) {
+                if (e.getSueldo() == null
+                        || e.getSueldo()
+                            .compareTo(sueldoMaximo) > 0) {
+                    return false;
+                }
+            }
+
+            // Filtro opcional por turno:
+            // solamente puede coincidir un Cajero.
+            if (turno != null && !turno.isBlank()) {
+                if (!(e instanceof Cajero cajero)) {
+                    return false;
+                }
+
+                if (cajero.getTurno() == null
+                        || !cajero.getTurno().equalsIgnoreCase(
+                            turno.trim()
+                        )) {
+                    return false;
+                }
+            }
+
+            // Filtro opcional por especialidad:
+            // solamente puede coincidir un Cocinero.
+            if (especialidad != null
+                    && !especialidad.isBlank()) {
+
+                if (!(e instanceof Cocinero cocinero)) {
+                    return false;
+                }
+
+                if (cocinero.getEspecialidad() == null
+                        || !cocinero.getEspecialidad()
+                            .toLowerCase(Locale.ROOT)
+                            .contains(
+                                especialidad.trim()
+                                    .toLowerCase(Locale.ROOT)
+                            )) {
+                    return false;
+                }
+            }
+
+            return true;
+        })
+        .collect(Collectors.toList());
+}
+
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Staff> listarInactivosPorUnidad(Long idUnidadDeVenta) {
+        return staffRepository.findByUnidadDeVenta_IdUnidadDeVentaAndActivoFalse(idUnidadDeVenta);
+    }
+
 }

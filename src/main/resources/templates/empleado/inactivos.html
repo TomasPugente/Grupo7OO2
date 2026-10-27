@@ -10,7 +10,7 @@
     <p th:if="${mensaje}" th:text="${mensaje}"></p>
 
     <div class="acciones">
-        <a class="btn secundario" th:href="@{/empleado}">
+        <a class="btn secundario" th:href="@{/responsable/empleados}">
             Volver a empleados activos
         </a>
     </div>
@@ -35,7 +35,7 @@
                     <td th:text="${empleado.email}"></td>
 
                     <td>
-                        <form th:action="@{/empleado/{id}/reactivar(id=${empleado.id})}"
+                        <form th:action="@{/responsable/empleados/{id}/reactivar(id=${empleado.id})}"
                               method="post"
                               onsubmit="return confirm('¿Reactivar a este empleado?');">
 

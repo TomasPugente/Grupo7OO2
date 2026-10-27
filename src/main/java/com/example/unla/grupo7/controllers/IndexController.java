@@ -18,7 +18,7 @@ public class IndexController {
     }
 
    
-    @GetMapping("")
+    @GetMapping({"", "/", "/index"})
     public ModelAndView index(Authentication authentication) {
 
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.INDEX);

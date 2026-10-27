@@ -3,9 +3,12 @@ package com.example.unla.grupo7.dtos;
 import java.time.LocalDate;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Pattern;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Data;
 
@@ -18,13 +21,14 @@ public class StaffFormDTO {
     @NotBlank
     private String apellido;
 
-    @Positive
+    @Min(value = 10000000, message = "El DNI debe tener exactamente 8 dígitos.")
+    @Max(value = 99999999, message = "El DNI debe tener exactamente 8 dígitos.")
     private int dni;
 
-    @NotNull
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @NotNull(message = "Debe ingresar la fecha de nacimiento.")
     private LocalDate fechaNacimiento;
 
-    @NotNull
     private LocalDate fechaIngreso;
 
     @NotBlank
@@ -35,6 +39,8 @@ public class StaffFormDTO {
     private String tipoEmpleado;
 
     private String especialidad;
+
+    private String turno;
 
     private Long unidadDeVentaId;
 }
