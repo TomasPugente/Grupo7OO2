@@ -15,6 +15,30 @@
         <a class="btn secundario" th:href="@{/responsable/dashboard}">Volver al dashboard</a>
     </div>
 
+    <div class="alerta error" th:if="${error != null}" th:text="${error}"></div>
+
+    <div class="panel">
+        <h2>Filtrar por fechas</h2>
+        <form method="get" th:action="@{/responsable/reportes}">
+            <div class="fila">
+                <div>
+                    <label for="desde">Desde</label>
+                    <input id="desde" name="desde" type="date"
+                           th:value="${desde != null} ? ${#temporals.format(desde, 'yyyy-MM-dd')} : ''">
+                </div>
+                <div>
+                    <label for="hasta">Hasta</label>
+                    <input id="hasta" name="hasta" type="date"
+                           th:value="${hasta != null} ? ${#temporals.format(hasta, 'yyyy-MM-dd')} : ''">
+                </div>
+            </div>
+            <div class="acciones">
+                <button class="btn" type="submit">Filtrar</button>
+                <a class="btn secundario" th:href="@{/responsable/reportes}">Ver total</a>
+            </div>
+        </form>
+    </div>
+
     <div class="panel">
         <h2>Contexto</h2>
         <div class="fila">
@@ -25,6 +49,12 @@
             <div class="dato">
                 <small>Festival</small>
                 <strong th:text="${rentabilidad.nombreFestival}">—</strong>
+            </div>
+            <div class="dato">
+                <small>Período</small>
+                <strong th:if="${rentabilidad.desde != null and rentabilidad.hasta != null}"
+                        th:text="${#temporals.format(rentabilidad.desde, 'dd/MM/yyyy')} + ' – ' + ${#temporals.format(rentabilidad.hasta, 'dd/MM/yyyy')}">01/01/2026 – 31/01/2026</strong>
+                <strong th:unless="${rentabilidad.desde != null and rentabilidad.hasta != null}">Total del festival</strong>
             </div>
         </div>
     </div>

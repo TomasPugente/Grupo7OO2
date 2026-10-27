@@ -1,6 +1,7 @@
 package com.example.unla.grupo7.services.implementation;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -44,25 +45,67 @@ public class RentabilidadService implements IRentabilidadService {
     @Transactional(readOnly = true)
     public RentabilidadDTO calcularPorUnidad(long idUnidadDeVenta) {
 
-        UnidadDeVenta unidad = unidadRepository.findById(idUnidadDeVenta)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "No existe la unidad de venta con id " + idUnidadDeVenta));
+        UnidadDeVenta unidad = cargarUnidad(idUnidadDeVenta);
 
         List<Pedido> pedidos =
                 pedidoRepository.findByUnidadDeVenta_IdUnidadDeVenta(idUnidadDeVenta);
+
+        List<DetallePedido> detalles = detallePedidoRepository
+                .findByPedido_UnidadDeVenta_IdUnidadDeVenta(idUnidadDeVenta);
+
+        return armarDTO(unidad, pedidos, detalles, null, null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public RentabilidadDTO calcularPorUnidadEntreFechas(long idUnidadDeVenta,
+                                                        LocalDate desde,
+                                                        LocalDate hasta) {
+
+        if (desde == null || hasta == null) {
+            throw new IllegalArgumentException(
+                    "Las fechas 'desde' y 'hasta' son obligatorias.");
+        }
+        if (desde.isAfter(hasta)) {
+            throw new IllegalArgumentException(
+                    "La fecha 'desde' no puede ser posterior a 'hasta'.");
+        }
+
+        UnidadDeVenta unidad = cargarUnidad(idUnidadDeVenta);
+
+        List<Pedido> pedidos = pedidoRepository
+                .findByUnidadDeVenta_IdUnidadDeVentaAndFechaTransaccionBetween(
+                        idUnidadDeVenta, desde, hasta);
+
+        List<DetallePedido> detalles = detallePedidoRepository
+                .findByPedido_UnidadDeVenta_IdUnidadDeVentaAndPedido_FechaTransaccionBetween(
+                        idUnidadDeVenta, desde, hasta);
+
+        return armarDTO(unidad, pedidos, detalles, desde, hasta);
+    }
+
+    private UnidadDeVenta cargarUnidad(long id) {
+        return unidadRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No existe la unidad de venta con id " + id));
+    }
+
+    private RentabilidadDTO armarDTO(UnidadDeVenta unidad,
+                                     List<Pedido> pedidos,
+                                     List<DetallePedido> detalles,
+                                     LocalDate desde,
+                                     LocalDate hasta) {
 
         BigDecimal pedidosTotales = pedidos.stream()
                 .map(this::precioTotalSeguro)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal costoPlatos = detallePedidoRepository
-                .findByPedido_UnidadDeVenta_IdUnidadDeVenta(idUnidadDeVenta)
-                .stream()
+        BigDecimal costoPlatos = detalles.stream()
                 .map(this::costoDetalle)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal sueldos = staffRepository
-                .findByUnidadDeVenta_IdUnidadDeVentaAndActivoTrue(idUnidadDeVenta)
+                .findByUnidadDeVenta_IdUnidadDeVentaAndActivoTrue(unidad.getIdUnidadDeVenta())
                 .stream()
                 .map(this::sueldoSeguro)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -85,7 +128,9 @@ public class RentabilidadService implements IRentabilidadService {
                 costoPlatos,
                 sueldos,
                 canon,
-                rentabilidadNeta);
+                rentabilidadNeta,
+                desde,
+                hasta);
     }
 
     private BigDecimal precioTotalSeguro(Pedido p) {

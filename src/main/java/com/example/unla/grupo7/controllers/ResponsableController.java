@@ -1,7 +1,10 @@
 package com.example.unla.grupo7.controllers;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.math.BigDecimal;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -54,18 +57,44 @@ public class ResponsableController {
         this.rentabilidadService = rentabilidadService;
     }
 
-    // RENTABILIDAD (CU-15)
+    // RENTABILIDAD (CU-15 total / CU-16 entre fechas)
 
     @GetMapping("/reportes")
-    public ModelAndView rentabilidad(Authentication authentication) {
+    public ModelAndView rentabilidad(
+            Authentication authentication,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
+
         UnidadDeVenta unidad =
                 unidadService.buscarUnidadPorResponsableUsername(authentication.getName());
 
-        RentabilidadDTO rentabilidad =
-                rentabilidadService.calcularPorUnidad(unidad.getIdUnidadDeVenta());
-
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.RESPONSABLE_RENTABILIDAD);
-        mAV.addObject("rentabilidad", rentabilidad);
+        mAV.addObject("desde", desde);
+        mAV.addObject("hasta", hasta);
+
+        boolean hayAlgunaFecha = desde != null || hasta != null;
+        boolean hayAmbasFechas = desde != null && hasta != null;
+
+        if (hayAlgunaFecha && !hayAmbasFechas) {
+            mAV.addObject("error", "Completá ambas fechas para filtrar.");
+            mAV.addObject("rentabilidad",
+                    rentabilidadService.calcularPorUnidad(unidad.getIdUnidadDeVenta()));
+            return mAV;
+        }
+
+        try {
+            RentabilidadDTO rentabilidad = hayAmbasFechas
+                    ? rentabilidadService.calcularPorUnidadEntreFechas(
+                            unidad.getIdUnidadDeVenta(), desde, hasta)
+                    : rentabilidadService.calcularPorUnidad(unidad.getIdUnidadDeVenta());
+            mAV.addObject("rentabilidad", rentabilidad);
+        } catch (IllegalArgumentException ex) {
+            mAV.addObject("error", ex.getMessage());
+            mAV.addObject("rentabilidad",
+                    rentabilidadService.calcularPorUnidad(unidad.getIdUnidadDeVenta()));
+        }
         return mAV;
     }
 
