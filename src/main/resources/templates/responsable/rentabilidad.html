@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Rentabilidad')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('responsable')}"></nav>
+<main class="contenedor">
+
+    <h1>Rentabilidad neta</h1>
+    <p class="subtitulo">
+        Ganancia de tu unidad en el festival =
+        pedidos − costo de platos − sueldos − canon.
+    </p>
+
+    <div class="barra-acciones">
+        <a class="btn secundario" th:href="@{/responsable/dashboard}">Volver al dashboard</a>
+    </div>
+
+    <div class="panel">
+        <h2>Contexto</h2>
+        <div class="fila">
+            <div class="dato">
+                <small>Unidad</small>
+                <strong th:text="${rentabilidad.nombreUnidad}">—</strong>
+            </div>
+            <div class="dato">
+                <small>Festival</small>
+                <strong th:text="${rentabilidad.nombreFestival}">—</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="fila">
+        <div class="panel">
+            <div class="dato">
+                <small>Pedidos totales</small>
+                <strong th:text="${'$ ' + #numbers.formatDecimal(rentabilidad.pedidosTotales, 1, 2)}">$ 0,00</strong>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="dato">
+                <small>Costo de platos</small>
+                <strong th:text="${'- $ ' + #numbers.formatDecimal(rentabilidad.costoPlatos, 1, 2)}">- $ 0,00</strong>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="dato">
+                <small>Sueldos (staff activo)</small>
+                <strong th:text="${'- $ ' + #numbers.formatDecimal(rentabilidad.sueldos, 1, 2)}">- $ 0,00</strong>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="dato">
+                <small>Canon</small>
+                <strong th:text="${'- $ ' + #numbers.formatDecimal(rentabilidad.canon, 1, 2)}">- $ 0,00</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="dato">
+            <small>Rentabilidad neta</small>
+            <strong th:text="${'$ ' + #numbers.formatDecimal(rentabilidad.rentabilidadNeta, 1, 2)}">$ 0,00</strong>
+        </div>
+    </div>
+
+</main>
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+</body>
+</html>

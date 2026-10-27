@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.unla.grupo7.dtos.PlatoDTO;
 import com.example.unla.grupo7.dtos.PlatoFiltroDTO;
+import com.example.unla.grupo7.dtos.RentabilidadDTO;
 import com.example.unla.grupo7.dtos.StaffDTO;
 import com.example.unla.grupo7.dtos.StaffFormDTO;
 import com.example.unla.grupo7.entities.Staff;
@@ -22,6 +23,7 @@ import com.example.unla.grupo7.helper.ViewRouteHelper;
 import com.example.unla.grupo7.repositories.IUnidadDeVentaRepository;
 import com.example.unla.grupo7.services.IFestivalService;
 import com.example.unla.grupo7.services.IPlatoService;
+import com.example.unla.grupo7.services.IRentabilidadService;
 import com.example.unla.grupo7.services.IStaffService;
 import com.example.unla.grupo7.services.IUnidadDeVentaService;
 import com.example.unla.grupo7.entities.Cajero;
@@ -39,14 +41,32 @@ public class ResponsableController {
     private final IUnidadDeVentaRepository unidadRepository;
     private final IPlatoService platoService;
     private final IUnidadDeVentaService unidadService;
+    private final IRentabilidadService rentabilidadService;
 
     public ResponsableController(
             IStaffService staffService,
-            IUnidadDeVentaRepository unidadRepository, IPlatoService platoService,  IUnidadDeVentaService unidadService) {
+            IUnidadDeVentaRepository unidadRepository, IPlatoService platoService,  IUnidadDeVentaService unidadService,
+            IRentabilidadService rentabilidadService) {
         this.staffService = staffService;
         this.unidadRepository = unidadRepository;
         this.platoService= platoService;
         this.unidadService= unidadService;
+        this.rentabilidadService = rentabilidadService;
+    }
+
+    // RENTABILIDAD (CU-15)
+
+    @GetMapping("/reportes")
+    public ModelAndView rentabilidad(Authentication authentication) {
+        UnidadDeVenta unidad =
+                unidadService.buscarUnidadPorResponsableUsername(authentication.getName());
+
+        RentabilidadDTO rentabilidad =
+                rentabilidadService.calcularPorUnidad(unidad.getIdUnidadDeVenta());
+
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.RESPONSABLE_RENTABILIDAD);
+        mAV.addObject("rentabilidad", rentabilidad);
+        return mAV;
     }
 
     // DASHBOARD
