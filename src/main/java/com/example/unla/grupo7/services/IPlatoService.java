@@ -1,8 +1,10 @@
 package com.example.unla.grupo7.services;
 import com.example.unla.grupo7.dtos.PlatoFiltroDTO;
 import java.util.List;
+import java.util.Optional;
 
 import com.example.unla.grupo7.dtos.PlatoDTO;
+import com.example.unla.grupo7.dtos.PlatoEstrellaDTO;
 
 public interface IPlatoService {
 
@@ -21,4 +23,7 @@ public interface IPlatoService {
 
     /** Baja lógica. */
     void eliminar(Long id, String username);
+
+    /** Plato con mayor cantidad total vendida en la unidad del usuario, con su cantidad. */
+    Optional<PlatoEstrellaDTO> obtenerPlatoEstrella(String username);
 }
