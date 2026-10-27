@@ -20,5 +20,7 @@ public class PedidosDTO {
 
     private BigDecimal precioTotal;
 
+    private String estado;
+
     private UnidadDeVenta unidadDeVenta;
 }
