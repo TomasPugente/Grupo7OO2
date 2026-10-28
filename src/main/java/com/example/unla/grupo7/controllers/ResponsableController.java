@@ -14,7 +14,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import com.example.unla.grupo7.dtos.ReporteVentaDTO;
+import com.example.unla.grupo7.repositories.IFestivalRepository;
+import com.example.unla.grupo7.services.IReporteVentaService;
 import com.example.unla.grupo7.dtos.PedidosDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
 import com.example.unla.grupo7.dtos.PlatoFiltroDTO;
@@ -50,6 +52,8 @@ public class ResponsableController {
     private final IRentabilidadService rentabilidadService;
     private final ICostosService costosService;
     private final IPedidoService pedidoService;
+    private final IReporteVentaService reporteVentaService;
+    private final IFestivalRepository festivalRepository;
 
     public ResponsableController(
             IStaffService staffService,
@@ -58,7 +62,9 @@ public class ResponsableController {
             IUnidadDeVentaService unidadService,
             IRentabilidadService rentabilidadService,
             ICostosService costosService,
-            IPedidoService pedidoService) {
+            IPedidoService pedidoService,
+            IReporteVentaService reporteVentaService,
+            IFestivalRepository festivalRepository) {
 
         this.staffService = staffService;
         this.unidadRepository = unidadRepository;
@@ -67,6 +73,27 @@ public class ResponsableController {
         this.rentabilidadService = rentabilidadService;
         this.costosService = costosService;
         this.pedidoService = pedidoService;
+        this.reporteVentaService = reporteVentaService;
+        this.festivalRepository = festivalRepository;
+    }
+
+        // RECAUDACION POR FESTIVAL
+
+    @GetMapping("/recaudacion")
+    public ModelAndView recaudacion(@RequestParam(required = false) Long idFestival) {
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.RESPONSABLE_RECAUDACION);
+        mAV.addObject("festivales", festivalRepository.findAll());
+        mAV.addObject("idFestival", idFestival);
+
+        if (idFestival != null) {
+            try {
+                ReporteVentaDTO reporte = reporteVentaService.recaudacionPorFestival(idFestival);
+                mAV.addObject("reporte", reporte);
+            } catch (IllegalArgumentException e) {
+                mAV.addObject("error", e.getMessage());
+            }
+        }
+        return mAV;
     }
 
     // RENTABILIDAD (CU-15 total / CU-16 entre fechas)
