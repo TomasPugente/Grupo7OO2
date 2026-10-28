@@ -17,7 +17,7 @@ public class ViewRouteHelper {
     public static final String VISTA_LISTA = "responsable/platos";
     public static final String VISTA_FORM = "responsable/plato-form";
     public static final String REDIRECT_LISTA = "redirect:/responsable/platos";
-	public final static String RESPONSABLE_CANON = "responsable/canon";
+    public final static String RESPONSABLE_RENTABILIDAD = "responsable/rentabilidad";
 
 	// EMPLEADO
 	public final static String EMPLEADO_DASHBOARD = "empleado/dashboard";

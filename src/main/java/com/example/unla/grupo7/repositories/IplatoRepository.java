@@ -3,7 +3,7 @@ import java.math.BigDecimal;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
-import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -36,12 +36,4 @@ public interface IplatoRepository extends JpaRepository<Plato, Long> {
                         @Param("precioMax") BigDecimal precioMax,
                         @Param("costoMin") BigDecimal costoMin,
                         @Param("costoMax") BigDecimal costoMax);
-
-    // Platos eliminados lógicamente de una unidad
-List<Plato> findByUnidadDeVenta_IdUnidadDeVentaAndActivoFalseOrderByNombreAsc(
-        Long idUnidadDeVenta);
-
-// Buscar un plato específico de una unidad, sin importar si está activo
-Optional<Plato> findByIdAndUnidadDeVenta_IdUnidadDeVenta(
-        Long id, Long idUnidadDeVenta);
 }
