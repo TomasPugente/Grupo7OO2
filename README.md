@@ -1,5 +1,5 @@
 # Grupo7OO2
-
+Script SQL
 -- =====================================================================
 -- Datos de prueba - Epicentro Gourmet (Grupo 7 OO2)
 -- 5 filas de costos (una por festival), 3 usuarios (admin, responsable, empleado),
