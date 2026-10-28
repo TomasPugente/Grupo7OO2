@@ -15,10 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.unla.grupo7.dtos.ReporteVentaDTO;
+import com.example.unla.grupo7.repositories.IDetallePedidoRepository;
 import com.example.unla.grupo7.repositories.IFestivalRepository;
 import com.example.unla.grupo7.services.IReporteVentaService;
+import com.example.unla.grupo7.dtos.CanonDTO;
 import com.example.unla.grupo7.dtos.PedidosDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
+import com.example.unla.grupo7.dtos.PlatoEstrellaDTO;
 import com.example.unla.grupo7.dtos.PlatoFiltroDTO;
 import com.example.unla.grupo7.dtos.RentabilidadDTO;
 import com.example.unla.grupo7.dtos.StaffDTO;
@@ -64,7 +67,8 @@ public class ResponsableController {
             ICostosService costosService,
             IPedidoService pedidoService,
             IReporteVentaService reporteVentaService,
-            IFestivalRepository festivalRepository) {
+            IFestivalRepository festivalRepository){
+
 
         this.staffService = staffService;
         this.unidadRepository = unidadRepository;
@@ -76,8 +80,27 @@ public class ResponsableController {
         this.reporteVentaService = reporteVentaService;
         this.festivalRepository = festivalRepository;
     }
-
-        // RECAUDACION POR FESTIVAL
+    
+    
+       // DASHBOARD
+   
+       @GetMapping("/dashboard")
+       public ModelAndView dashboardResponsable(Authentication authentication) {
+           String username = authentication.getName();   // el usuario con el que inició sesión
+           UnidadDeVenta unidad = unidadService.buscarUnidadPorResponsableUsername(username);
+           ModelAndView mAV = new ModelAndView(ViewRouteHelper.RESPONSABLE_DASHBOARD);
+           BigDecimal canon= costosService.calcularCanon(unidad);
+           List<Pedido> pedidos= pedidoService.traerUltimos5Pedidos(username);
+           mAV.addObject("unidad", unidad);
+           mAV.addObject("festival", unidad.getFestival());
+           mAV.addObject("canon", canon);
+           mAV.addObject("pedidos", pedidos);
+           mAV.addObject("pedido", new PedidosDTO());
+            mAV.addObject("platoEstrella",
+                platoService.obtenerPlatoEstrella(username));     
+                      return mAV;
+       }
+    // RECAUDACION POR FESTIVAL
 
     @GetMapping("/recaudacion")
     public ModelAndView recaudacion(@RequestParam(required = false) Long idFestival) {
@@ -98,7 +121,8 @@ public class ResponsableController {
 
     // RENTABILIDAD (CU-15 total / CU-16 entre fechas)
 
-    @GetMapping("/reportes")
+
+       @GetMapping("/reportes")
     public ModelAndView rentabilidad(
             Authentication authentication,
             @RequestParam(required = false)
@@ -137,28 +161,24 @@ public class ResponsableController {
         return mAV;
     }
 
-    // DASHBOARD
+        @GetMapping("/canon")
+    public ModelAndView canon(Authentication authentication) {
+        UnidadDeVenta unidad =
+                unidadService.buscarUnidadPorResponsableUsername(authentication.getName());
 
-    @GetMapping("/dashboard")
-    public ModelAndView dashboardResponsable(Authentication authentication) {
-        String username = authentication.getName();   // el usuario con el que inició sesión
-        UnidadDeVenta unidad = unidadService.buscarUnidadPorResponsableUsername(username);
-        ModelAndView mAV = new ModelAndView(ViewRouteHelper.RESPONSABLE_DASHBOARD);
-        BigDecimal canon= costosService.calcularCanon(unidad);
-        List<Pedido> pedidos= pedidoService.traerUltimos5Pedidos(username);
-        mAV.addObject("unidad", unidad);
-        mAV.addObject("festival", unidad.getFestival());
-        mAV.addObject("canon", canon);
-        mAV.addObject("pedidos", pedidos);
-        mAV.addObject("pedido", new PedidosDTO());
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.RESPONSABLE_CANON);
+        try {
+            CanonDTO canon = costosService.detalleCanon(unidad);
+            mAV.addObject("canon", canon);
+        } catch (IllegalStateException ex) {
+            mAV.addObject("error", ex.getMessage());
+        }
         return mAV;
     }
 
-    
-
 
     // VER EMPLEADOS
-
+    
     @GetMapping("/empleados")
     public ModelAndView empleados(
         Authentication authentication,
@@ -472,5 +492,33 @@ public class ResponsableController {
     private void agregarError(BindingResult result, IllegalArgumentException e) {
         result.reject("plato.invalido", e.getMessage());
     }
+
+    @GetMapping("/platos/inactivos")
+public String listarPlatosInactivos(
+        Authentication authentication,
+        Model model) {
+
+    model.addAttribute(
+        "platos",
+        platoService.listarInactivos(authentication.getName())
+    );
+
+    return "responsable/platos-inactivos";
+}
+
+    @PostMapping("/platos/{id}/reactivar")
+public String reactivarPlato(
+        @PathVariable Long id,
+        Authentication authentication,
+        RedirectAttributes flash) {
+
+    platoService.reactivar(id, authentication.getName());
+
+    flash.addFlashAttribute(
+        "exito", "Plato reactivado correctamente."
+    );
+
+    return "redirect:/responsable/platos/inactivos";
+}
     
 }

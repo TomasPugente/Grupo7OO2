@@ -4,14 +4,17 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import com.example.unla.grupo7.dtos.PlatoFiltroDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
+import com.example.unla.grupo7.dtos.PlatoEstrellaDTO;
 import com.example.unla.grupo7.entities.Plato;
 import com.example.unla.grupo7.entities.UnidadDeVenta;
+import com.example.unla.grupo7.repositories.IDetallePedidoRepository;
 import com.example.unla.grupo7.repositories.IUnidadDeVentaRepository;
 import com.example.unla.grupo7.repositories.IplatoRepository;
 import com.example.unla.grupo7.services.IPlatoService;
@@ -23,11 +26,12 @@ public class PlatoService implements IPlatoService {
     private static final BigDecimal MAXIMO = new BigDecimal("9999999999.99");
     private final IplatoRepository platoRepository;
     private final IUnidadDeVentaRepository unidadDeVentaRepository;
-
+    private final IDetallePedidoRepository detallePedidoRepository;
     public PlatoService(IplatoRepository platoRepository,
-                        IUnidadDeVentaRepository unidadDeVentaRepository) {
+                        IUnidadDeVentaRepository unidadDeVentaRepository, IDetallePedidoRepository detallePedidoRepository) {
         this.platoRepository = platoRepository;
         this.unidadDeVentaRepository = unidadDeVentaRepository;
+        this.detallePedidoRepository=detallePedidoRepository;
     }
 
     @Override
@@ -123,6 +127,19 @@ public class PlatoService implements IPlatoService {
         platoRepository.save(plato);
     }
 
+        @Override
+    @Transactional(readOnly = true)
+    public List<PlatoDTO> listarInactivos(String username) {
+        UnidadDeVenta unidad = unidadDelUsuario(username);
+
+    return platoRepository
+                .findByUnidadDeVenta_IdUnidadDeVentaAndActivoFalseOrderByNombreAsc(
+                        unidad.getIdUnidadDeVenta())
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
     // ---------- helpers ----------
 
     /** Regla de negocio: no se puede vender un plato por debajo de su costo de producción. */
@@ -165,5 +182,33 @@ public class PlatoService implements IPlatoService {
     }
 
     
-    
+    public void reactivar(Long id, String username) {
+        UnidadDeVenta unidad = unidadDelUsuario(username);
+
+        Plato plato = platoRepository
+                .findByIdAndUnidadDeVenta_IdUnidadDeVenta(
+                        id, unidad.getIdUnidadDeVenta())
+                .filter(p -> !p.isActivo())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No se encontró el plato eliminado."));
+
+        plato.setActivo(true);
+        platoRepository.save(plato);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PlatoEstrellaDTO obtenerPlatoEstrella(String username) {
+        UnidadDeVenta unidad = unidadDelUsuario(username);
+
+        List<Object[]> resultado = detallePedidoRepository.findPlatosMasVendidos(
+                unidad.getIdUnidadDeVenta(), PageRequest.of(0, 1));
+
+        Object[] fila = resultado.get(0);
+        Plato plato = (Plato) fila[0];
+        long cantidad = ((Number) fila[1]).longValue();
+
+        return new PlatoEstrellaDTO(toDTO(plato), cantidad);
+    }
 }

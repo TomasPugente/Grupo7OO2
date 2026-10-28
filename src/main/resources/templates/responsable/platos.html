@@ -11,6 +11,7 @@
       <p class="subtitulo">Menú de la unidad de venta.</p>
     </div>
     <a class="btn" th:href="@{/responsable/platos/nuevo}">Agregar plato</a>
+    <a class="btn" th:href="@{/responsable/platos/inactivos}">Ver platos eliminados</a>
   </div>
 
   <div th:if="${exito}" class="alerta ok" th:text="${exito}"></div>

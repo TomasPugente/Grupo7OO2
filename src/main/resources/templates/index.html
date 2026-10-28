@@ -34,6 +34,11 @@
             Unidades con mayor canon
         </a>
 
+        <a class="btn" 
+            th:if="${esAdmin}"
+            th:href="@{/responsable/recaudacion}">Recaudación</a>
+
+
         <a class="btn secundario separador"
            sec:authorize="isAnonymous()"
            th:href="@{/login}">
