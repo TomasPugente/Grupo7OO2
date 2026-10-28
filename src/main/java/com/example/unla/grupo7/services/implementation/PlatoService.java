@@ -41,6 +41,19 @@ public class PlatoService implements IPlatoService {
                 .toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<PlatoDTO> listarInactivos(String username) {
+        UnidadDeVenta unidad = unidadDelUsuario(username);
+
+        return platoRepository
+                .findByUnidadDeVenta_IdUnidadDeVentaAndActivoFalseOrderByNombreAsc(
+                        unidad.getIdUnidadDeVenta())
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
         @Override
     @Transactional(readOnly = true)
     public List<PlatoDTO> filtrar(PlatoFiltroDTO filtro, String username) {
@@ -123,6 +136,23 @@ public class PlatoService implements IPlatoService {
         platoRepository.save(plato);
     }
 
+    @Override
+    @Transactional
+    public void reactivar(Long id, String username) {
+        UnidadDeVenta unidad = unidadDelUsuario(username);
+
+        Plato plato = platoRepository
+                .findByIdAndUnidadDeVenta_IdUnidadDeVenta(
+                        id, unidad.getIdUnidadDeVenta())
+                .filter(p -> !p.isActivo())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No se encontró el plato eliminado."));
+
+        plato.setActivo(true);
+        platoRepository.save(plato);
+    }
+
     // ---------- helpers ----------
 
     /** Regla de negocio: no se puede vender un plato por debajo de su costo de producción. */
@@ -164,6 +194,7 @@ public class PlatoService implements IPlatoService {
         return new PlatoDTO(p.getId(), p.getNombre(), p.getPrecioVenta(), p.getCostoProduccion());
     }
 
+    
     
     
 }
