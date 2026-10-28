@@ -1,1 +1,490 @@
 # Grupo7OO2
+-- =====================================================================
+-- Datos de prueba - Epicentro Gourmet (Grupo 7 OO2)
+-- Reinicia y recarga TODO: 5 festivales, 25 unidades de venta, 125 platos,
+-- 75 pedidos con detalle (3 por unidad; la recaudación de cada unidad = suma de sus pedidos), 5 filas de costos (una por festival), 3 usuarios (admin, responsable, empleado),
+-- 1 responsable y 1 empleado.
+-- Contraseña de los 3 usuarios: 1234
+-- =====================================================================
+USE festival_gourmet;
+
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE detalle_pedido;
+TRUNCATE TABLE pedido;
+TRUNCATE TABLE plato;
+TRUNCATE TABLE staff;
+TRUNCATE TABLE responsable;
+TRUNCATE TABLE costos;
+TRUNCATE TABLE unidad_de_venta;
+TRUNCATE TABLE festival;
+TRUNCATE TABLE user_role;
+TRUNCATE TABLE `user`;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- ---------------------------------------------------------------------
+-- 5 festivales
+-- ---------------------------------------------------------------------
+INSERT INTO festival (id_festival, activo, created_at, updated_at, fecha_inicio, fecha_fin, nombre, temporada) VALUES
+(1, 1, NOW(6), NOW(6), '2026-12-01', '2026-12-15', 'Festival del Chocolate', 'Verano 2026'),
+(2, 1, NOW(6), NOW(6), '2026-04-10', '2026-04-25', 'Feria de Sabores del Mar', 'Otoño 2026'),
+(3, 1, NOW(6), NOW(6), '2027-03-21', '2027-03-28', 'Festival Otoño Criollo', 'Otoño'),
+(4, 1, NOW(6), NOW(6), '2027-06-21', '2027-06-28', 'Festival Invierno Cocinado', 'Invierno'),
+(5, 1, NOW(6), NOW(6), '2027-09-21', '2027-09-30', 'Gran Festival Gourmet Anual', 'Anual');
+
+-- ---------------------------------------------------------------------
+-- 25 unidades de venta (5 por festival). Impares: Food Truck, pares: Puesto Desarmable.
+-- El código tiene 10 caracteres (FT/PD + número).
+-- ---------------------------------------------------------------------
+INSERT INTO unidad_de_venta (dtype, id_unidad_de_venta, activo, codigo, created_at, updated_at, nombre_comercial, recaudacion, superficie, patente, requiere_electricidad, festival_id) VALUES
+('FoodTruck', 1, 1, 'FT00000001', NOW(6), NOW(6), 'Sabor Criollo', 82500, 12.5, 'AB101CD', 1, 1),
+('FoodTruck', 3, 1, 'FT00000003', NOW(6), NOW(6), 'Pasta Nonna', 147900, 21.5, 'AB103CD', 0, 1),
+('FoodTruck', 5, 1, 'FT00000005', NOW(6), NOW(6), 'Dulce Tentación', 182700, 8.0, 'AB105CD', 1, 1),
+('FoodTruck', 7, 1, 'FT00000007', NOW(6), NOW(6), 'El Buen Bocado', 70000, 17.0, 'AB107CD', 1, 2),
+('FoodTruck', 9, 1, 'FT00000009', NOW(6), NOW(6), 'Casa Vegana', 115200, 26.0, 'AB109CD', 0, 2),
+('FoodTruck', 11, 1, 'FT00000011', NOW(6), NOW(6), 'Wok Express', 147300, 12.5, 'AB111CD', 1, 3),
+('FoodTruck', 13, 1, 'FT00000013', NOW(6), NOW(6), 'La Pizzería', 216300, 21.5, 'AB113CD', 1, 3),
+('FoodTruck', 15, 1, 'FT00000015', NOW(6), NOW(6), 'Sushi Pampa', 86700, 8.0, 'AB115CD', 0, 3),
+('FoodTruck', 17, 1, 'FT00000017', NOW(6), NOW(6), 'Postres del Valle', 136600, 17.0, 'AB117CD', 1, 4),
+('FoodTruck', 19, 1, 'FT00000019', NOW(6), NOW(6), 'Milanesa Master', 185400, 26.0, 'AB119CD', 1, 4),
+('FoodTruck', 21, 1, 'FT00000021', NOW(6), NOW(6), 'Pollo Crocante', 60900, 12.5, 'AB121CD', 0, 5),
+('FoodTruck', 23, 1, 'FT00000023', NOW(6), NOW(6), 'Panes y Más', 125100, 21.5, 'AB123CD', 1, 5),
+('FoodTruck', 25, 1, 'FT00000025', NOW(6), NOW(6), 'Sabores del Norte', 158700, 8.0, 'AB125CD', 1, 5);
+
+INSERT INTO unidad_de_venta (dtype, id_unidad_de_venta, activo, codigo, created_at, updated_at, nombre_comercial, recaudacion, superficie, cantidad_carpas, tiempo_montaje, festival_id) VALUES
+('PuestoDesarmable', 2, 1, 'PD00000002', NOW(6), NOW(6), 'La Parrilla Dorada', 71100, 17.0, 4, 34, 1),
+('PuestoDesarmable', 4, 1, 'PD00000004', NOW(6), NOW(6), 'Tacos del Sur', 103800, 26.0, 2, 38, 1),
+('PuestoDesarmable', 6, 1, 'PD00000006', NOW(6), NOW(6), 'Mar y Tierra', 116400, 12.5, 4, 42, 2),
+('PuestoDesarmable', 8, 1, 'PD00000008', NOW(6), NOW(6), 'Fuego Lento', 64600, 21.5, 2, 46, 2),
+('PuestoDesarmable', 10, 1, 'PD00000010', NOW(6), NOW(6), 'Empanadas Don Pepe', 87600, 8.0, 4, 50, 2),
+('PuestoDesarmable', 12, 1, 'PD00000012', NOW(6), NOW(6), 'Burger Lab', 112500, 17.0, 2, 54, 3),
+('PuestoDesarmable', 14, 1, 'PD00000014', NOW(6), NOW(6), 'Café Gourmet', 43800, 26.0, 4, 58, 3),
+('PuestoDesarmable', 16, 1, 'PD00000016', NOW(6), NOW(6), 'Choripán Real', 63600, 12.5, 2, 62, 4),
+('PuestoDesarmable', 18, 1, 'PD00000018', NOW(6), NOW(6), 'Cocina Andina', 107800, 21.5, 4, 66, 4),
+('PuestoDesarmable', 20, 1, 'PD00000020', NOW(6), NOW(6), 'Helados Artesanales', 134400, 8.0, 2, 70, 4),
+('PuestoDesarmable', 22, 1, 'PD00000022', NOW(6), NOW(6), 'Arroces del Mundo', 57300, 17.0, 4, 74, 5),
+('PuestoDesarmable', 24, 1, 'PD00000024', NOW(6), NOW(6), 'Gaucho Grill', 88800, 26.0, 2, 78, 5);
+
+-- ---------------------------------------------------------------------
+-- Costos de cada festival (5 filas, una por festival). De acá salen los valores del canon
+-- ($500 por m2, $2000 de electricidad, $10 por minuto de montaje) y de los sueldos.
+-- ---------------------------------------------------------------------
+INSERT INTO costos (id_costos, costo_por_superficie, costo_por_montaje, plus_por_electricidad, sueldo_base, monto_anio_antiguedad, plus_de_cocinero, plus_de_cocinero_ayudante, plus_de_lava_platos, festival_id, created_at, updated_at) VALUES
+(1, 500, 10, 2000, 100000, 5000, 150000, 100000, 50000, 1, NOW(6), NOW(6)),
+(2, 500, 10, 2000, 100000, 5000, 150000, 100000, 50000, 2, NOW(6), NOW(6)),
+(3, 500, 10, 2000, 100000, 5000, 150000, 100000, 50000, 3, NOW(6), NOW(6)),
+(4, 500, 10, 2000, 100000, 5000, 150000, 100000, 50000, 4, NOW(6), NOW(6)),
+(5, 500, 10, 2000, 100000, 5000, 150000, 100000, 50000, 5, NOW(6), NOW(6));
+
+-- ---------------------------------------------------------------------
+-- 125 platos (5 por unidad). Los platos 5, 10 y 15 están eliminados lógicamente
+-- (activo = 0) para probar que no aparecen en el listado ni en el filtro.
+-- ---------------------------------------------------------------------
+INSERT INTO plato (id, activo, nombre, precio_venta, costo_produccion, unidad_de_venta_id) VALUES
+(1, 1, 'Papas rústicas', 3300, 1100, 1),
+(2, 1, 'Ensalada fresca', 3900, 1300, 1),
+(3, 1, 'Pizza de muzzarella', 6600, 2400, 1),
+(4, 1, 'Choripán', 4400, 1600, 1),
+(5, 0, 'Tacos de pollo', 6000, 2100, 1),
+(6, 1, 'Empanada de carne', 2100, 650, 2),
+(7, 1, 'Limonada casera', 2500, 500, 2),
+(8, 1, 'Milanesa con puré', 7500, 2900, 2),
+(9, 1, 'Flan con dulce de leche', 3800, 1000, 2),
+(10, 0, 'Hamburguesa clásica', 5800, 2200, 2),
+(11, 1, 'Papas rústicas', 3500, 1100, 3),
+(12, 1, 'Ensalada fresca', 4100, 1300, 3),
+(13, 1, 'Pizza de muzzarella', 6800, 2400, 3),
+(14, 1, 'Choripán', 4600, 1600, 3),
+(15, 0, 'Tacos de pollo', 6200, 2100, 3),
+(16, 1, 'Empanada de carne', 2300, 650, 4),
+(17, 1, 'Limonada casera', 2700, 500, 4),
+(18, 1, 'Milanesa con puré', 7700, 2900, 4),
+(19, 1, 'Flan con dulce de leche', 4000, 1000, 4),
+(20, 1, 'Hamburguesa clásica', 6000, 2200, 4),
+(21, 1, 'Papas rústicas', 3700, 1100, 5),
+(22, 1, 'Ensalada fresca', 4300, 1300, 5),
+(23, 1, 'Pizza de muzzarella', 7000, 2400, 5),
+(24, 1, 'Choripán', 4800, 1600, 5),
+(25, 1, 'Tacos de pollo', 6400, 2100, 5),
+(26, 1, 'Empanada de carne', 2000, 650, 6),
+(27, 1, 'Limonada casera', 2400, 500, 6),
+(28, 1, 'Milanesa con puré', 7400, 2900, 6),
+(29, 1, 'Flan con dulce de leche', 3700, 1000, 6),
+(30, 1, 'Hamburguesa clásica', 5700, 2200, 6),
+(31, 1, 'Papas rústicas', 3400, 1100, 7),
+(32, 1, 'Ensalada fresca', 4000, 1300, 7),
+(33, 1, 'Pizza de muzzarella', 6700, 2400, 7),
+(34, 1, 'Choripán', 4500, 1600, 7),
+(35, 1, 'Tacos de pollo', 6100, 2100, 7),
+(36, 1, 'Empanada de carne', 2200, 650, 8),
+(37, 1, 'Limonada casera', 2600, 500, 8),
+(38, 1, 'Milanesa con puré', 7600, 2900, 8),
+(39, 1, 'Flan con dulce de leche', 3900, 1000, 8),
+(40, 1, 'Hamburguesa clásica', 5900, 2200, 8),
+(41, 1, 'Papas rústicas', 3600, 1100, 9),
+(42, 1, 'Ensalada fresca', 4200, 1300, 9),
+(43, 1, 'Pizza de muzzarella', 6900, 2400, 9),
+(44, 1, 'Choripán', 4700, 1600, 9),
+(45, 1, 'Tacos de pollo', 6300, 2100, 9),
+(46, 1, 'Empanada de carne', 2400, 650, 10),
+(47, 1, 'Limonada casera', 2800, 500, 10),
+(48, 1, 'Milanesa con puré', 7800, 2900, 10),
+(49, 1, 'Flan con dulce de leche', 4100, 1000, 10),
+(50, 1, 'Hamburguesa clásica', 6100, 2200, 10),
+(51, 1, 'Papas rústicas', 3300, 1100, 11),
+(52, 1, 'Ensalada fresca', 3900, 1300, 11),
+(53, 1, 'Pizza de muzzarella', 6600, 2400, 11),
+(54, 1, 'Choripán', 4400, 1600, 11),
+(55, 1, 'Tacos de pollo', 6000, 2100, 11),
+(56, 1, 'Empanada de carne', 2100, 650, 12),
+(57, 1, 'Limonada casera', 2500, 500, 12),
+(58, 1, 'Milanesa con puré', 7500, 2900, 12),
+(59, 1, 'Flan con dulce de leche', 3800, 1000, 12),
+(60, 1, 'Hamburguesa clásica', 5800, 2200, 12),
+(61, 1, 'Papas rústicas', 3500, 1100, 13),
+(62, 1, 'Ensalada fresca', 4100, 1300, 13),
+(63, 1, 'Pizza de muzzarella', 6800, 2400, 13),
+(64, 1, 'Choripán', 4600, 1600, 13),
+(65, 1, 'Tacos de pollo', 6200, 2100, 13),
+(66, 1, 'Empanada de carne', 2300, 650, 14),
+(67, 1, 'Limonada casera', 2700, 500, 14),
+(68, 1, 'Milanesa con puré', 7700, 2900, 14),
+(69, 1, 'Flan con dulce de leche', 4000, 1000, 14),
+(70, 1, 'Hamburguesa clásica', 6000, 2200, 14),
+(71, 1, 'Papas rústicas', 3700, 1100, 15),
+(72, 1, 'Ensalada fresca', 4300, 1300, 15),
+(73, 1, 'Pizza de muzzarella', 7000, 2400, 15),
+(74, 1, 'Choripán', 4800, 1600, 15),
+(75, 1, 'Tacos de pollo', 6400, 2100, 15),
+(76, 1, 'Empanada de carne', 2000, 650, 16),
+(77, 1, 'Limonada casera', 2400, 500, 16),
+(78, 1, 'Milanesa con puré', 7400, 2900, 16),
+(79, 1, 'Flan con dulce de leche', 3700, 1000, 16),
+(80, 1, 'Hamburguesa clásica', 5700, 2200, 16),
+(81, 1, 'Papas rústicas', 3400, 1100, 17),
+(82, 1, 'Ensalada fresca', 4000, 1300, 17),
+(83, 1, 'Pizza de muzzarella', 6700, 2400, 17),
+(84, 1, 'Choripán', 4500, 1600, 17),
+(85, 1, 'Tacos de pollo', 6100, 2100, 17),
+(86, 1, 'Empanada de carne', 2200, 650, 18),
+(87, 1, 'Limonada casera', 2600, 500, 18),
+(88, 1, 'Milanesa con puré', 7600, 2900, 18),
+(89, 1, 'Flan con dulce de leche', 3900, 1000, 18),
+(90, 1, 'Hamburguesa clásica', 5900, 2200, 18),
+(91, 1, 'Papas rústicas', 3600, 1100, 19),
+(92, 1, 'Ensalada fresca', 4200, 1300, 19),
+(93, 1, 'Pizza de muzzarella', 6900, 2400, 19),
+(94, 1, 'Choripán', 4700, 1600, 19),
+(95, 1, 'Tacos de pollo', 6300, 2100, 19),
+(96, 1, 'Empanada de carne', 2400, 650, 20),
+(97, 1, 'Limonada casera', 2800, 500, 20),
+(98, 1, 'Milanesa con puré', 7800, 2900, 20),
+(99, 1, 'Flan con dulce de leche', 4100, 1000, 20),
+(100, 1, 'Hamburguesa clásica', 6100, 2200, 20),
+(101, 1, 'Papas rústicas', 3300, 1100, 21),
+(102, 1, 'Ensalada fresca', 3900, 1300, 21),
+(103, 1, 'Pizza de muzzarella', 6600, 2400, 21),
+(104, 1, 'Choripán', 4400, 1600, 21),
+(105, 1, 'Tacos de pollo', 6000, 2100, 21),
+(106, 1, 'Empanada de carne', 2100, 650, 22),
+(107, 1, 'Limonada casera', 2500, 500, 22),
+(108, 1, 'Milanesa con puré', 7500, 2900, 22),
+(109, 1, 'Flan con dulce de leche', 3800, 1000, 22),
+(110, 1, 'Hamburguesa clásica', 5800, 2200, 22),
+(111, 1, 'Papas rústicas', 3500, 1100, 23),
+(112, 1, 'Ensalada fresca', 4100, 1300, 23),
+(113, 1, 'Pizza de muzzarella', 6800, 2400, 23),
+(114, 1, 'Choripán', 4600, 1600, 23),
+(115, 1, 'Tacos de pollo', 6200, 2100, 23),
+(116, 1, 'Empanada de carne', 2300, 650, 24),
+(117, 1, 'Limonada casera', 2700, 500, 24),
+(118, 1, 'Milanesa con puré', 7700, 2900, 24),
+(119, 1, 'Flan con dulce de leche', 4000, 1000, 24),
+(120, 1, 'Hamburguesa clásica', 6000, 2200, 24),
+(121, 1, 'Papas rústicas', 3700, 1100, 25),
+(122, 1, 'Ensalada fresca', 4300, 1300, 25),
+(123, 1, 'Pizza de muzzarella', 7000, 2400, 25),
+(124, 1, 'Choripán', 4800, 1600, 25),
+(125, 1, 'Tacos de pollo', 6400, 2100, 25);
+
+-- ---------------------------------------------------------------------
+-- 75 pedidos (3 por unidad, fechas dentro del festival) con sus detalles.
+-- precio_total = suma(precio_venta x cantidad). Dos de tres pedidos 'Entregado'.
+-- ---------------------------------------------------------------------
+INSERT INTO pedido (id_pedido, fecha_transaccion, precio_total, estado, unidad_de_venta_id, created_at, updated_at) VALUES
+(1, '2026-12-02', 33300, 'Entregado', 1, NOW(6), NOW(6)),
+(2, '2026-12-04', 21000, 'Entregado', 1, NOW(6), NOW(6)),
+(3, '2026-12-06', 28200, 'En preparación', 1, NOW(6), NOW(6)),
+(4, '2026-12-03', 18000, 'Entregado', 2, NOW(6), NOW(6)),
+(5, '2026-12-05', 27200, 'Entregado', 2, NOW(6), NOW(6)),
+(6, '2026-12-07', 25900, 'En preparación', 2, NOW(6), NOW(6)),
+(7, '2026-12-04', 45000, 'Entregado', 3, NOW(6), NOW(6)),
+(8, '2026-12-06', 50300, 'Entregado', 3, NOW(6), NOW(6)),
+(9, '2026-12-08', 52600, 'En preparación', 3, NOW(6), NOW(6)),
+(10, '2026-12-05', 39600, 'Entregado', 4, NOW(6), NOW(6)),
+(11, '2026-12-07', 34600, 'Entregado', 4, NOW(6), NOW(6)),
+(12, '2026-12-09', 29600, 'En preparación', 4, NOW(6), NOW(6)),
+(13, '2026-12-06', 60900, 'Entregado', 5, NOW(6), NOW(6)),
+(14, '2026-12-08', 60900, 'Entregado', 5, NOW(6), NOW(6)),
+(15, '2026-12-10', 60900, 'En preparación', 5, NOW(6), NOW(6)),
+(16, '2026-04-16', 42400, 'Entregado', 6, NOW(6), NOW(6)),
+(17, '2026-04-18', 34800, 'Entregado', 6, NOW(6), NOW(6)),
+(18, '2026-04-20', 39200, 'En preparación', 6, NOW(6), NOW(6)),
+(19, '2026-04-17', 14200, 'Entregado', 7, NOW(6), NOW(6)),
+(20, '2026-04-19', 29000, 'Entregado', 7, NOW(6), NOW(6)),
+(21, '2026-04-21', 26800, 'En preparación', 7, NOW(6), NOW(6)),
+(22, '2026-04-18', 18800, 'Entregado', 8, NOW(6), NOW(6)),
+(23, '2026-04-20', 22200, 'Entregado', 8, NOW(6), NOW(6)),
+(24, '2026-04-22', 23600, 'En preparación', 8, NOW(6), NOW(6)),
+(25, '2026-04-19', 46200, 'Entregado', 9, NOW(6), NOW(6)),
+(26, '2026-04-21', 38400, 'Entregado', 9, NOW(6), NOW(6)),
+(27, '2026-04-23', 30600, 'En preparación', 9, NOW(6), NOW(6)),
+(28, '2026-04-20', 29200, 'Entregado', 10, NOW(6), NOW(6)),
+(29, '2026-04-22', 29200, 'Entregado', 10, NOW(6), NOW(6)),
+(30, '2026-04-24', 29200, 'En preparación', 10, NOW(6), NOW(6)),
+(31, '2027-03-25', 54900, 'Entregado', 11, NOW(6), NOW(6)),
+(32, '2027-03-27', 42600, 'Entregado', 11, NOW(6), NOW(6)),
+(33, '2027-03-22', 49800, 'En preparación', 11, NOW(6), NOW(6)),
+(34, '2027-03-26', 31800, 'Entregado', 12, NOW(6), NOW(6)),
+(35, '2027-03-21', 41000, 'Entregado', 12, NOW(6), NOW(6)),
+(36, '2027-03-23', 39700, 'En preparación', 12, NOW(6), NOW(6)),
+(37, '2027-03-27', 67800, 'Entregado', 13, NOW(6), NOW(6)),
+(38, '2027-03-22', 73100, 'Entregado', 13, NOW(6), NOW(6)),
+(39, '2027-03-24', 75400, 'En preparación', 13, NOW(6), NOW(6)),
+(40, '2027-03-21', 19600, 'Entregado', 14, NOW(6), NOW(6)),
+(41, '2027-03-23', 14600, 'Entregado', 14, NOW(6), NOW(6)),
+(42, '2027-03-25', 9600, 'En preparación', 14, NOW(6), NOW(6)),
+(43, '2027-03-22', 28900, 'Entregado', 15, NOW(6), NOW(6)),
+(44, '2027-03-24', 28900, 'Entregado', 15, NOW(6), NOW(6)),
+(45, '2027-03-26', 28900, 'En preparación', 15, NOW(6), NOW(6)),
+(46, '2027-06-23', 24800, 'Entregado', 16, NOW(6), NOW(6)),
+(47, '2027-06-25', 17200, 'Entregado', 16, NOW(6), NOW(6)),
+(48, '2027-06-27', 21600, 'En preparación', 16, NOW(6), NOW(6)),
+(49, '2027-06-24', 36400, 'Entregado', 17, NOW(6), NOW(6)),
+(50, '2027-06-26', 51200, 'Entregado', 17, NOW(6), NOW(6)),
+(51, '2027-06-21', 49000, 'En preparación', 17, NOW(6), NOW(6)),
+(52, '2027-06-25', 33200, 'Entregado', 18, NOW(6), NOW(6)),
+(53, '2027-06-27', 36600, 'Entregado', 18, NOW(6), NOW(6)),
+(54, '2027-06-22', 38000, 'En preparación', 18, NOW(6), NOW(6)),
+(55, '2027-06-26', 69600, 'Entregado', 19, NOW(6), NOW(6)),
+(56, '2027-06-21', 61800, 'Entregado', 19, NOW(6), NOW(6)),
+(57, '2027-06-23', 54000, 'En preparación', 19, NOW(6), NOW(6)),
+(58, '2027-06-27', 44800, 'Entregado', 20, NOW(6), NOW(6)),
+(59, '2027-06-22', 44800, 'Entregado', 20, NOW(6), NOW(6)),
+(60, '2027-06-24', 44800, 'En preparación', 20, NOW(6), NOW(6)),
+(61, '2027-09-24', 26100, 'Entregado', 21, NOW(6), NOW(6)),
+(62, '2027-09-26', 13800, 'Entregado', 21, NOW(6), NOW(6)),
+(63, '2027-09-28', 21000, 'En preparación', 21, NOW(6), NOW(6)),
+(64, '2027-09-25', 13400, 'Entregado', 22, NOW(6), NOW(6)),
+(65, '2027-09-27', 22600, 'Entregado', 22, NOW(6), NOW(6)),
+(66, '2027-09-29', 21300, 'En preparación', 22, NOW(6), NOW(6)),
+(67, '2027-09-26', 37400, 'Entregado', 23, NOW(6), NOW(6)),
+(68, '2027-09-28', 42700, 'Entregado', 23, NOW(6), NOW(6)),
+(69, '2027-09-21', 45000, 'En preparación', 23, NOW(6), NOW(6)),
+(70, '2027-09-27', 34600, 'Entregado', 24, NOW(6), NOW(6)),
+(71, '2027-09-29', 29600, 'Entregado', 24, NOW(6), NOW(6)),
+(72, '2027-09-22', 24600, 'En preparación', 24, NOW(6), NOW(6)),
+(73, '2027-09-28', 52900, 'Entregado', 25, NOW(6), NOW(6)),
+(74, '2027-09-21', 52900, 'Entregado', 25, NOW(6), NOW(6)),
+(75, '2027-09-23', 52900, 'En preparación', 25, NOW(6), NOW(6));
+
+INSERT INTO detalle_pedido (cantidad, pedido_id, plato_id, created_at, updated_at) VALUES
+(3, 1, 1, NOW(6), NOW(6)),
+(6, 1, 2, NOW(6), NOW(6)),
+(4, 2, 1, NOW(6), NOW(6)),
+(2, 2, 2, NOW(6), NOW(6)),
+(5, 3, 1, NOW(6), NOW(6)),
+(3, 3, 2, NOW(6), NOW(6)),
+(5, 4, 6, NOW(6), NOW(6)),
+(3, 4, 7, NOW(6), NOW(6)),
+(7, 5, 6, NOW(6), NOW(6)),
+(5, 5, 7, NOW(6), NOW(6)),
+(4, 6, 6, NOW(6), NOW(6)),
+(7, 6, 7, NOW(6), NOW(6)),
+(7, 7, 11, NOW(6), NOW(6)),
+(5, 7, 12, NOW(6), NOW(6)),
+(5, 8, 11, NOW(6), NOW(6)),
+(8, 8, 12, NOW(6), NOW(6)),
+(8, 9, 11, NOW(6), NOW(6)),
+(6, 9, 12, NOW(6), NOW(6)),
+(9, 10, 16, NOW(6), NOW(6)),
+(7, 10, 17, NOW(6), NOW(6)),
+(8, 11, 16, NOW(6), NOW(6)),
+(6, 11, 17, NOW(6), NOW(6)),
+(7, 12, 16, NOW(6), NOW(6)),
+(5, 12, 17, NOW(6), NOW(6)),
+(6, 13, 21, NOW(6), NOW(6)),
+(9, 13, 22, NOW(6), NOW(6)),
+(6, 14, 21, NOW(6), NOW(6)),
+(9, 14, 22, NOW(6), NOW(6)),
+(6, 15, 21, NOW(6), NOW(6)),
+(9, 15, 22, NOW(6), NOW(6)),
+(8, 16, 26, NOW(6), NOW(6)),
+(11, 16, 27, NOW(6), NOW(6)),
+(9, 17, 26, NOW(6), NOW(6)),
+(7, 17, 27, NOW(6), NOW(6)),
+(10, 18, 26, NOW(6), NOW(6)),
+(8, 18, 27, NOW(6), NOW(6)),
+(3, 19, 31, NOW(6), NOW(6)),
+(1, 19, 32, NOW(6), NOW(6)),
+(5, 20, 31, NOW(6), NOW(6)),
+(3, 20, 32, NOW(6), NOW(6)),
+(2, 21, 31, NOW(6), NOW(6)),
+(5, 21, 32, NOW(6), NOW(6)),
+(5, 22, 36, NOW(6), NOW(6)),
+(3, 22, 37, NOW(6), NOW(6)),
+(3, 23, 36, NOW(6), NOW(6)),
+(6, 23, 37, NOW(6), NOW(6)),
+(6, 24, 36, NOW(6), NOW(6)),
+(4, 24, 37, NOW(6), NOW(6)),
+(7, 25, 41, NOW(6), NOW(6)),
+(5, 25, 42, NOW(6), NOW(6)),
+(6, 26, 41, NOW(6), NOW(6)),
+(4, 26, 42, NOW(6), NOW(6)),
+(5, 27, 41, NOW(6), NOW(6)),
+(3, 27, 42, NOW(6), NOW(6)),
+(4, 28, 46, NOW(6), NOW(6)),
+(7, 28, 47, NOW(6), NOW(6)),
+(4, 29, 46, NOW(6), NOW(6)),
+(7, 29, 47, NOW(6), NOW(6)),
+(4, 30, 46, NOW(6), NOW(6)),
+(7, 30, 47, NOW(6), NOW(6)),
+(6, 31, 51, NOW(6), NOW(6)),
+(9, 31, 52, NOW(6), NOW(6)),
+(7, 32, 51, NOW(6), NOW(6)),
+(5, 32, 52, NOW(6), NOW(6)),
+(8, 33, 51, NOW(6), NOW(6)),
+(6, 33, 52, NOW(6), NOW(6)),
+(8, 34, 56, NOW(6), NOW(6)),
+(6, 34, 57, NOW(6), NOW(6)),
+(10, 35, 56, NOW(6), NOW(6)),
+(8, 35, 57, NOW(6), NOW(6)),
+(7, 36, 56, NOW(6), NOW(6)),
+(10, 36, 57, NOW(6), NOW(6)),
+(10, 37, 61, NOW(6), NOW(6)),
+(8, 37, 62, NOW(6), NOW(6)),
+(8, 38, 61, NOW(6), NOW(6)),
+(11, 38, 62, NOW(6), NOW(6)),
+(11, 39, 61, NOW(6), NOW(6)),
+(9, 39, 62, NOW(6), NOW(6)),
+(5, 40, 66, NOW(6), NOW(6)),
+(3, 40, 67, NOW(6), NOW(6)),
+(4, 41, 66, NOW(6), NOW(6)),
+(2, 41, 67, NOW(6), NOW(6)),
+(3, 42, 66, NOW(6), NOW(6)),
+(1, 42, 67, NOW(6), NOW(6)),
+(2, 43, 71, NOW(6), NOW(6)),
+(5, 43, 72, NOW(6), NOW(6)),
+(2, 44, 71, NOW(6), NOW(6)),
+(5, 44, 72, NOW(6), NOW(6)),
+(2, 45, 71, NOW(6), NOW(6)),
+(5, 45, 72, NOW(6), NOW(6)),
+(4, 46, 76, NOW(6), NOW(6)),
+(7, 46, 77, NOW(6), NOW(6)),
+(5, 47, 76, NOW(6), NOW(6)),
+(3, 47, 77, NOW(6), NOW(6)),
+(6, 48, 76, NOW(6), NOW(6)),
+(4, 48, 77, NOW(6), NOW(6)),
+(6, 49, 81, NOW(6), NOW(6)),
+(4, 49, 82, NOW(6), NOW(6)),
+(8, 50, 81, NOW(6), NOW(6)),
+(6, 50, 82, NOW(6), NOW(6)),
+(5, 51, 81, NOW(6), NOW(6)),
+(8, 51, 82, NOW(6), NOW(6)),
+(8, 52, 86, NOW(6), NOW(6)),
+(6, 52, 87, NOW(6), NOW(6)),
+(6, 53, 86, NOW(6), NOW(6)),
+(9, 53, 87, NOW(6), NOW(6)),
+(9, 54, 86, NOW(6), NOW(6)),
+(7, 54, 87, NOW(6), NOW(6)),
+(10, 55, 91, NOW(6), NOW(6)),
+(8, 55, 92, NOW(6), NOW(6)),
+(9, 56, 91, NOW(6), NOW(6)),
+(7, 56, 92, NOW(6), NOW(6)),
+(8, 57, 91, NOW(6), NOW(6)),
+(6, 57, 92, NOW(6), NOW(6)),
+(7, 58, 96, NOW(6), NOW(6)),
+(10, 58, 97, NOW(6), NOW(6)),
+(7, 59, 96, NOW(6), NOW(6)),
+(10, 59, 97, NOW(6), NOW(6)),
+(7, 60, 96, NOW(6), NOW(6)),
+(10, 60, 97, NOW(6), NOW(6)),
+(2, 61, 101, NOW(6), NOW(6)),
+(5, 61, 102, NOW(6), NOW(6)),
+(3, 62, 101, NOW(6), NOW(6)),
+(1, 62, 102, NOW(6), NOW(6)),
+(4, 63, 101, NOW(6), NOW(6)),
+(2, 63, 102, NOW(6), NOW(6)),
+(4, 64, 106, NOW(6), NOW(6)),
+(2, 64, 107, NOW(6), NOW(6)),
+(6, 65, 106, NOW(6), NOW(6)),
+(4, 65, 107, NOW(6), NOW(6)),
+(3, 66, 106, NOW(6), NOW(6)),
+(6, 66, 107, NOW(6), NOW(6)),
+(6, 67, 111, NOW(6), NOW(6)),
+(4, 67, 112, NOW(6), NOW(6)),
+(4, 68, 111, NOW(6), NOW(6)),
+(7, 68, 112, NOW(6), NOW(6)),
+(7, 69, 111, NOW(6), NOW(6)),
+(5, 69, 112, NOW(6), NOW(6)),
+(8, 70, 116, NOW(6), NOW(6)),
+(6, 70, 117, NOW(6), NOW(6)),
+(7, 71, 116, NOW(6), NOW(6)),
+(5, 71, 117, NOW(6), NOW(6)),
+(6, 72, 116, NOW(6), NOW(6)),
+(4, 72, 117, NOW(6), NOW(6)),
+(5, 73, 121, NOW(6), NOW(6)),
+(8, 73, 122, NOW(6), NOW(6)),
+(5, 74, 121, NOW(6), NOW(6)),
+(8, 74, 122, NOW(6), NOW(6)),
+(5, 75, 121, NOW(6), NOW(6)),
+(8, 75, 122, NOW(6), NOW(6));
+
+-- Recaudación esperada por festival (comparala con el reporte de la app):
+-- Festival 1: $ 588000  (15 pedidos)
+-- Festival 2: $ 453800  (15 pedidos)
+-- Festival 3: $ 606600  (15 pedidos)
+-- Festival 4: $ 627800  (15 pedidos)
+-- Festival 5: $ 490800  (15 pedidos)
+
+-- ---------------------------------------------------------------------
+-- 3 usuarios (contraseña: 1234) y sus roles
+-- ---------------------------------------------------------------------
+INSERT INTO `user` (id, created_at, updated_at, enabled, username, password) VALUES
+(1, NOW(6), NOW(6), 1, 'admin@festival.com', '$2a$10$SRRTss/yqID0jcv/oHU5oeAzAPA/7DV9e69FrP/fGJZAamndOvTjW'),
+(2, NOW(6), NOW(6), 1, 'responsable@festival.com', '$2a$10$SRRTss/yqID0jcv/oHU5oeAzAPA/7DV9e69FrP/fGJZAamndOvTjW'),
+(3, NOW(6), NOW(6), 1, 'empleado@festival.com', '$2a$10$SRRTss/yqID0jcv/oHU5oeAzAPA/7DV9e69FrP/fGJZAamndOvTjW');
+
+INSERT INTO user_role (created_at, updated_at, role, user_id) VALUES
+(NOW(6), NOW(6), 'ADMINISTRADOR', 1),
+(NOW(6), NOW(6), 'RESPONSABLE', 2),
+(NOW(6), NOW(6), 'EMPLEADO', 3);
+
+-- ---------------------------------------------------------------------
+-- Responsable a cargo de la unidad 1 (Sabor Criollo)
+-- ---------------------------------------------------------------------
+INSERT INTO responsable (created_at, updated_at, nombre, apellido, dni, fecha_nacimiento, fecha_ingreso, unidad_de_venta_id, user_id) VALUES
+(NOW(6), NOW(6), 'Carlos', 'Gómez', 30111222, '1985-04-12', '2026-01-10', 1, 2);
+
+-- ---------------------------------------------------------------------
+-- Empleado (Cajero) en la unidad 1. Su usuario es su email.
+-- ---------------------------------------------------------------------
+INSERT INTO staff (dtype, activo, nombre, apellido, dni, email, fecha_nacimiento, fecha_ingreso, sueldo, turno, horario_entrada, horario_salida, unidad_de_venta_id, user_id) VALUES
+('Cajero', 1, 'Laura', 'Pérez', 35222333, 'empleado@festival.com', '1992-08-30', '2026-02-01', 450000.00, 'MAÑANA', '08:00:00', '16:00:00', 1, 3);
+
+-- ---------------------------------------------------------------------
+-- Verificación rápida (deberías ver: 5 / 25 / 125 / 122 / 5 / 3 / 3 / 1 / 1 / 75)
+-- ---------------------------------------------------------------------
+SELECT (SELECT COUNT(*) FROM festival)                  AS festivales,
+       (SELECT COUNT(*) FROM unidad_de_venta)           AS unidades,
+       (SELECT COUNT(*) FROM plato)                     AS platos_total,
+       (SELECT COUNT(*) FROM plato WHERE activo = 1)    AS platos_activos,
+       (SELECT COUNT(*) FROM costos)                    AS costos,
+       (SELECT COUNT(*) FROM `user`)                    AS usuarios,
+       (SELECT COUNT(*) FROM user_role)                 AS roles,
+       (SELECT COUNT(*) FROM responsable)               AS responsables,
+       (SELECT COUNT(*) FROM staff)                     AS empleados,
+       (SELECT COUNT(*) FROM pedido)                    AS pedidos;
+
+admin@festival.com 1234
+responsable@festival.com 1234
+empleado@festival.com 1234

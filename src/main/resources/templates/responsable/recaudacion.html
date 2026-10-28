@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Recaudación')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('responsable')}"></nav>
+<main class="contenedor">
+
+    <h1>Recaudación por festival</h1>
+    <p class="subtitulo">Total recaudado por todas las unidades de venta de un festival.</p>
+
+    <div class="barra-acciones">
+        <a class="btn secundario" th:href="@{/responsable/dashboard}">Volver al dashboard</a>
+    </div>
+
+    <form th:action="@{/responsable/recaudacion}" method="get" class="panel">
+        <label for="idFestival">Festival</label>
+        <select id="idFestival" name="idFestival" required>
+            <option value="">Seleccioná un festival</option>
+            <option th:each="f : ${festivales}"
+                    th:value="${f.idFestival}"
+                    th:text="${f.nombre} + ' (' + ${f.temporada} + ')'"
+                    th:selected="${idFestival != null and idFestival == f.idFestival}"></option>
+        </select>
+        <button class="btn" type="submit">Ver recaudación</button>
+    </form>
+
+    <div class="alerta error" th:if="${error != null}" th:text="${error}"></div>
+
+    <div class="panel" th:if="${reporte != null}">
+        <h2 th:text="${reporte.nombreFestival}">Festival</h2>
+        <div class="fila">
+            <div class="dato"><small>Temporada</small><strong th:text="${reporte.temporada}">—</strong></div>
+            <div class="dato"><small>Desde</small><strong th:text="${reporte.fechaInicio}">—</strong></div>
+            <div class="dato"><small>Hasta</small><strong th:text="${reporte.fechaFin}">—</strong></div>
+            <div class="dato"><small>Pedidos</small><strong th:text="${reporte.cantidadPedidos}">0</strong></div>
+            <div class="dato"><small>Recaudación total</small>
+                <strong th:text="'$ ' + ${#numbers.formatDecimal(reporte.recaudacionTotal, 1, 'POINT', 2, 'COMMA')}">$ 0,00</strong></div>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>
