@@ -21,4 +21,8 @@ public interface IPlatoService {
 
     /** Baja lógica. */
     void eliminar(Long id, String username);
+
+    List<PlatoDTO> listarInactivos(String username);
+
+    void reactivar(Long id, String username);
 }

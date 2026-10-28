@@ -29,7 +29,7 @@ import com.example.unla.grupo7.services.IUnidadDeVentaService;
 import com.example.unla.grupo7.entities.Cajero;
 import com.example.unla.grupo7.entities.Cocinero;
 import com.example.unla.grupo7.entities.Pedido;
-
+import com.example.unla.grupo7.dtos.CanonDTO;
 import jakarta.validation.Valid;
 
 @Controller
@@ -54,6 +54,23 @@ public class ResponsableController {
         this.unidadService= unidadService;
         this.costosService= costosService;
         this.pedidoService=pedidoService;
+    }
+
+    // CANON DE LA UNIDAD
+
+    @GetMapping("/canon")
+    public ModelAndView canon(Authentication authentication) {
+        UnidadDeVenta unidad =
+                unidadService.buscarUnidadPorResponsableUsername(authentication.getName());
+
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.RESPONSABLE_CANON);
+        try {
+            CanonDTO canon = costosService.detalleCanon(unidad);
+            mAV.addObject("canon", canon);
+        } catch (IllegalStateException ex) {
+            mAV.addObject("error", ex.getMessage());
+        }
+        return mAV;
     }
 
     // DASHBOARD
@@ -298,7 +315,7 @@ public class ResponsableController {
                 .anyMatch(a -> a.getAuthority().equals("ROLE_RESPONSABLE"));
         return esResponsable ? "responsable" : "empleado";
     }
-
+    @PreAuthorize("hasAnyRole('RESPONSABLE', 'EMPLEADO')")
     @GetMapping("/platos")
     public String platos(@Valid @ModelAttribute("filtro") PlatoFiltroDTO filtro,
                          BindingResult result,
@@ -332,7 +349,7 @@ public class ResponsableController {
         return ViewRouteHelper.VISTA_FORM;
     }
 
-    @PostMapping("")
+    @PostMapping("/platos")
     public String crear(@Valid @ModelAttribute("plato") PlatoDTO plato,
                         BindingResult result,
                         Authentication authentication,
@@ -392,4 +409,32 @@ public class ResponsableController {
         result.reject("plato.invalido", e.getMessage());
     }
     
+    @GetMapping("/platos/inactivos")
+public String listarPlatosInactivos(
+        Authentication authentication,
+        Model model) {
+
+    model.addAttribute(
+        "platos",
+        platoService.listarInactivos(authentication.getName())
+    );
+
+    return "responsable/platos-inactivos";
+}
+
+    @PostMapping("/platos/{id}/reactivar")
+public String reactivarPlato(
+        @PathVariable Long id,
+        Authentication authentication,
+        RedirectAttributes flash) {
+
+    platoService.reactivar(id, authentication.getName());
+
+    flash.addFlashAttribute(
+        "exito", "Plato reactivado correctamente."
+    );
+
+    return "redirect:/responsable/platos/inactivos";
+}
+
 }

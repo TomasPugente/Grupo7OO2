@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Platos eliminados')}"></head>
+
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar(${rolNav})}"></nav>
+
+<main class="contenedor">
+
+    <!-- Encabezado -->
+    <div class="fila-ordenamiento">
+        <div>
+            <h1>Platos eliminados</h1>
+            <p class="subtitulo">
+                Administrá los platos dados de baja de tu unidad de venta.
+            </p>
+        </div>
+
+        <a class="btn secundario"
+           th:href="@{/responsable/platos}">
+            Volver a platos vigentes
+        </a>
+    </div>
+
+    <!-- Mensajes -->
+    <div th:if="${exito}"
+         class="alerta ok"
+         th:text="${exito}">
+    </div>
+
+    <!-- Listado -->
+    <div class="panel tabla-wrap">
+
+        <h2>Listado de platos eliminados</h2>
+
+        <p class="subtitulo" th:if="${#lists.isEmpty(platos)}">
+            No hay platos eliminados para mostrar.
+        </p>
+
+        <table th:unless="${#lists.isEmpty(platos)}">
+
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th class="num">Precio de venta</th>
+                    <th class="num">Costo de producción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr th:each="p : ${platos}">
+
+                    <td th:text="${p.nombre}"></td>
+
+                    <td class="num"
+                        th:text="${'$ ' + #numbers.formatDecimal(p.precioVenta, 1, 'POINT', 2, 'COMMA')}">
+                    </td>
+
+                    <td class="num"
+                        th:text="${'$ ' + #numbers.formatDecimal(p.costoProduccion, 1, 'POINT', 2, 'COMMA')}">
+                    </td>
+
+                    <td>
+                        <div class="acciones">
+
+                            <form
+                                th:action="@{/responsable/platos/{id}/reactivar(id=${p.id})}"
+                                method="post"
+                                onsubmit="return confirm('¿Querés reactivar este plato?');">
+
+                                <button class="btn chico"
+                                        type="submit">
+                                    Reactivar
+                                </button>
+
+                            </form>
+
+                        </div>
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+
+</body>
+</html>
+

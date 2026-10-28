@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Canon')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('responsable')}"></nav>
+<main class="contenedor">
+
+    <h1>Canon de la unidad</h1>
+    <p class="subtitulo">Monto que debe pagar tu unidad de venta por participar del festival.</p>
+
+    <div class="barra-acciones">
+        <a class="btn secundario" th:href="@{/responsable/dashboard}">Volver al dashboard</a>
+    </div>
+
+    <div class="alerta error" th:if="${error != null}" th:text="${error}"></div>
+
+    <th:block th:if="${canon != null}">
+
+        <div class="panel">
+            <h2>Unidad</h2>
+            <div class="fila">
+                <div class="dato"><small>Nombre comercial</small><strong th:text="${canon.nombreUnidad}">—</strong></div>
+                <div class="dato"><small>Código</small><strong th:text="${canon.codigo}">—</strong></div>
+                <div class="dato"><small>Tipo</small><strong th:text="${canon.tipoUnidad}">—</strong></div>
+                <div class="dato"><small>Festival</small><strong th:text="${canon.nombreFestival}">—</strong></div>
+            </div>
+        </div>
+
+        <div class="panel tabla-wrap">
+            <h2>Cómo se calcula</h2>
+            <table>
+                <thead>
+                    <tr><th>Concepto</th><th class="num">Detalle</th><th class="num">Importe</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Superficie</td>
+                        <td class="num"
+                            th:text="${#numbers.formatDecimal(canon.superficie, 1, 'POINT', 1, 'COMMA')} + ' m² × $ ' + ${#numbers.formatDecimal(canon.costoPorSuperficie, 1, 'POINT', 2, 'COMMA')}"></td>
+                        <td class="num"
+                            th:text="'$ ' + ${#numbers.formatDecimal(canon.subtotalSuperficie, 1, 'POINT', 2, 'COMMA')}"></td>
+                    </tr>
+
+                    <tr th:if="${canon.tipoUnidad == 'Food Truck'}">
+                        <td>Conexión eléctrica</td>
+                        <td class="num" th:text="${canon.requiereElectricidad} ? 'Requiere electricidad' : 'No requiere'"></td>
+                        <td class="num"
+                            th:text="'+ $ ' + ${#numbers.formatDecimal(canon.plusElectricidad, 1, 'POINT', 2, 'COMMA')}"></td>
+                    </tr>
+
+                    <tr th:if="${canon.tipoUnidad == 'Puesto Desarmable'}">
+                        <td>Descuento por montaje</td>
+                        <td class="num"
+                            th:text="${canon.tiempoMontaje} + ' min × $ ' + ${#numbers.formatDecimal(canon.costoPorMontaje, 1, 'POINT', 2, 'COMMA')}"></td>
+                        <td class="num"
+                            th:text="'- $ ' + ${#numbers.formatDecimal(canon.descuentoMontaje, 1, 'POINT', 2, 'COMMA')}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel">
+            <div class="dato">
+                <small>Canon a pagar</small>
+                <strong th:text="'$ ' + ${#numbers.formatDecimal(canon.total, 1, 'POINT', 2, 'COMMA')}">$ 0,00</strong>
+            </div>
+        </div>
+
+    </th:block>
+
+</main>
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+</body>
+</html>
