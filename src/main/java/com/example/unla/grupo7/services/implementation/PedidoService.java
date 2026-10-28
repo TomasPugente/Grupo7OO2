@@ -47,7 +47,7 @@ public class PedidoService implements IPedidoService {
 
     public List<Pedido> traerUltimos5Pedidos(String username){
         UnidadDeVenta unidad = unidadDelUsuario(username);
-            return pedidoRepository.findFirst5ByUnidadDeVenta_IdUnidadDeVentaOrderByFechaTransaccion(unidad.getIdUnidadDeVenta());
+            return pedidoRepository.findFirst5ByUnidadDeVenta_IdUnidadDeVentaOrderByFechaTransaccionDesc(unidad.getIdUnidadDeVenta());
     }
 
     public Pedido crear(PedidoFormDTO form, UnidadDeVenta unidad) {
