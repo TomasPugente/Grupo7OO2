@@ -19,7 +19,7 @@ public interface IPedidoRepository extends JpaRepository<Pedido, Long> {
             LocalDate hasta);
 
     // Dashboard: últimos cinco pedidos de la unidad
-    List<Pedido> findFirst5ByUnidadDeVenta_IdUnidadDeVentaOrderByFechaTransaccionDesc(
+    List<Pedido> findFirst5ByUnidadDeVenta_IdUnidadDeVentaOrderByFechaTransaccion(
             long idUnidadDeVenta);
 }
 
