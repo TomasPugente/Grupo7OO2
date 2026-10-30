@@ -52,7 +52,28 @@
         </p>
         <p th:unless="${platoEstrella != null}">Todavía no hay ventas registradas.</p>
     </div>
-
+    <div class="panel tabla-wrap">
+    <h2>Liquidación de haberes</h2>
+    <table>
+        <thead>
+            <tr><th>Empleado</th><th>Rol</th><th class="num">Sueldo base</th>
+                <th class="num">Adicional</th><th class="num">%</th><th class="num">Total a cobrar</th></tr>
+        </thead>
+        <tbody>
+            <tr th:each="l : ${liquidaciones}">
+                <td th:text="${l.empleado}">María Díaz</td>
+                <td th:text="${l.rol}">Cocina · Cocinero</td>
+                <td class="num" th:text="${#numbers.formatDecimal(l.sueldoBase, 1, 'POINT', 2, 'COMMA')}">100.000,00</td>
+                <td class="num" th:text="${#numbers.formatDecimal(l.adicional, 1, 'POINT', 2, 'COMMA')}">150.000,00</td>
+                <td class="num" th:text="${l.porcentaje} + '%'">100%</td>
+                <td class="num" th:text="'$ ' + ${#numbers.formatDecimal(l.total, 1, 'POINT', 2, 'COMMA')}">$ 250.000,00</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(liquidaciones)}">
+                <td colspan="6">No hay personal activo para liquidar.</td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
     <div class="panel tabla-wrap">
         <h2>Últimos pedidos</h2>
         <table>

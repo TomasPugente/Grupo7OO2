@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.math.BigDecimal;
 
+import org.hibernate.Hibernate;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +20,7 @@ import com.example.unla.grupo7.repositories.IDetallePedidoRepository;
 import com.example.unla.grupo7.repositories.IFestivalRepository;
 import com.example.unla.grupo7.services.IReporteVentaService;
 import com.example.unla.grupo7.dtos.CanonDTO;
+import com.example.unla.grupo7.dtos.LiquidacionDTO;
 import com.example.unla.grupo7.dtos.PedidosDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
 import com.example.unla.grupo7.dtos.PlatoEstrellaDTO;
@@ -38,6 +40,7 @@ import com.example.unla.grupo7.services.IStaffService;
 import com.example.unla.grupo7.services.IUnidadDeVentaService;
 import com.example.unla.grupo7.entities.Cajero;
 import com.example.unla.grupo7.entities.Cocinero;
+import com.example.unla.grupo7.entities.Festival;
 import com.example.unla.grupo7.entities.Pedido;
 
 import jakarta.validation.Valid;
@@ -79,27 +82,34 @@ public class ResponsableController {
         this.pedidoService = pedidoService;
         this.reporteVentaService = reporteVentaService;
         this.festivalRepository = festivalRepository;
-    }
+        }
     
     
        // DASHBOARD
    
        @GetMapping("/dashboard")
        public ModelAndView dashboardResponsable(Authentication authentication) {
-           String username = authentication.getName();   // el usuario con el que inició sesión
+           String username = authentication.getName();  
            UnidadDeVenta unidad = unidadService.buscarUnidadPorResponsableUsername(username);
            ModelAndView mAV = new ModelAndView(ViewRouteHelper.RESPONSABLE_DASHBOARD);
            BigDecimal canon= costosService.calcularCanon(unidad);
            List<Pedido> pedidos= pedidoService.traerUltimos5Pedidos(username);
-           mAV.addObject("unidad", unidad);
-           mAV.addObject("festival", unidad.getFestival());
-           mAV.addObject("canon", canon);
-           mAV.addObject("pedidos", pedidos);
-           mAV.addObject("pedido", new PedidosDTO());
+           Festival festival = unidad.getFestival();
+            List<LiquidacionDTO> liquidaciones = staffService.listarActivosPorUnidad(unidad.getIdUnidadDeVenta()).stream()
+                .filter(s -> Hibernate.unproxy(s) instanceof Cajero || Hibernate.unproxy(s) instanceof Cocinero)
+                .map(s -> staffService.liquidarYActualizarSueldo(s, festival))
+                .toList();
+            mAV.addObject("unidad", unidad);
+            mAV.addObject("festival", unidad.getFestival());
+            mAV.addObject("canon", canon);
+            mAV.addObject("pedidos", pedidos);
+            mAV.addObject("pedido", new PedidosDTO());
             mAV.addObject("platoEstrella",
-                platoService.obtenerPlatoEstrella(username));     
-                      return mAV;
-       }
+            platoService.obtenerPlatoEstrella(username));     
+            mAV.addObject("liquidaciones", liquidaciones);
+            return mAV;
+            }
+
     // RECAUDACION POR FESTIVAL
 
     @GetMapping("/recaudacion")
