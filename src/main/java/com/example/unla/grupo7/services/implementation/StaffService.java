@@ -7,10 +7,12 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
 
+import org.hibernate.Hibernate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.unla.grupo7.dtos.LiquidacionDTO;
 import com.example.unla.grupo7.dtos.StaffFormDTO;
 import com.example.unla.grupo7.entities.Staff;
 import com.example.unla.grupo7.entities.UnidadDeVenta;
@@ -19,9 +21,11 @@ import com.example.unla.grupo7.entities.UserRole;
 import com.example.unla.grupo7.repositories.IStaffRepository;
 import com.example.unla.grupo7.repositories.IUnidadDeVentaRepository;
 import com.example.unla.grupo7.repositories.IUserRepository;
+import com.example.unla.grupo7.services.ICostosService;
 import com.example.unla.grupo7.services.IStaffService;
 import com.example.unla.grupo7.entities.Cajero;
 import com.example.unla.grupo7.entities.Cocinero;
+import com.example.unla.grupo7.entities.Festival;
 
 
 @Service
@@ -39,6 +43,7 @@ public class StaffService implements IStaffService {
     private final IUnidadDeVentaRepository unidadRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final ICostosService costosService;
 
     private final SecureRandom random = new SecureRandom();
 
@@ -47,13 +52,15 @@ public class StaffService implements IStaffService {
             IUserRepository userRepository,
             IUnidadDeVentaRepository unidadRepository,
             PasswordEncoder passwordEncoder,
-            EmailService emailService) {
+            EmailService emailService,
+            ICostosService costosService) {
 
         this.staffRepository = staffRepository;
         this.userRepository = userRepository;
         this.unidadRepository = unidadRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.costosService= costosService;
     }
 
     public Staff buscarPorNombre(String username) {
@@ -478,10 +485,19 @@ public class StaffService implements IStaffService {
 
 
 
-    @Override
-    @Transactional(readOnly = true)
     public List<Staff> listarInactivosPorUnidad(Long idUnidadDeVenta) {
         return staffRepository.findByUnidadDeVenta_IdUnidadDeVentaAndActivoFalse(idUnidadDeVenta);
     }
+
+    public LiquidacionDTO liquidarYActualizarSueldo(Staff staff, Festival festival) {
+    Staff real = (Staff) Hibernate.unproxy(staff);
+
+    LiquidacionDTO liquidacion = costosService.liquidarSueldo(real, festival);
+
+    real.setSueldo(liquidacion.getTotal()); 
+    staffRepository.save(real);
+
+    return liquidacion;
+}
 
 }
