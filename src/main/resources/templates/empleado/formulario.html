@@ -23,6 +23,12 @@
           : @{/responsable/empleados/nuevo}"
       method="post">
 
+        <div th:if="${#fields.hasErrors('mayorDeEdad')}"
+            class="alert alert-danger">
+            <strong>Atención:</strong>
+            <span th:errors="*{mayorDeEdad}"></span>
+        </div>
+
 
         <div>
             <label for="nombre">Nombre</label>
@@ -103,10 +109,20 @@
 
         <div id="campoEspecialidad">
             <label for="especialidad">Especialidad del cocinero</label>
-            <input id="especialidad"
-                   type="text"
-                   th:field="*{especialidad}"
-                   maxlength="100">
+
+            <select id="especialidad" th:field="*{especialidad}">
+                <option value="">Seleccione una especialidad</option>
+                <option value="Cocinero">Cocinero</option>
+                <option value="Cocinero ayudante">Cocinero ayudante</option>
+                <option value="Lavaplatos">Lavaplatos</option>
+            </select>
+        </div>
+
+        <div id="campoPlus">
+            <label for="plusPorCategoria">Plus por categoría</label>
+            <input id="plusPorCategoria"
+                 type="text"
+                readonly>
         </div>
 
         <p>El sueldo no se carga en este formulario.</p>
@@ -136,18 +152,38 @@ document.addEventListener("DOMContentLoaded", function () {
     const turno =
         document.getElementById("turno");
 
+    const campoPlus = document.getElementById("campoPlus");
+    const plus = document.getElementById("plusPorCategoria");
+    
+    function actualizarPlus() {
+        const valores = {
+            "Cocinero": 150000,
+            "Cocinero ayudante": 100000,
+            "Lavaplatos": 50000
+        };
+
+        const valor = valores[especialidad.value];
+
+        plus.value = valor != null
+            ? "$ " + valor.toLocaleString("es-AR")
+            : "";
+    }
+
+
+
     function actualizarCampos() {
         const esCocinero = tipo.value === "Cocinero";
         const esCajero = tipo.value === "Cajero";
 
         campoEspecialidad.style.display =
             esCocinero ? "" : "none";
-
         especialidad.required = esCocinero;
+
+        campoPlus.style.display =
+            esCocinero ? "" : "none";
 
         campoTurno.style.display =
             esCajero ? "" : "none";
-
         turno.required = esCajero;
 
         if (!esCocinero) {
@@ -157,9 +193,14 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!esCajero) {
             turno.value = "";
         }
+    
+
+        actualizarPlus();
     }
 
     tipo.addEventListener("change", actualizarCampos);
+
+    especialidad.addEventListener("change", actualizarPlus);
 
     actualizarCampos();
 });

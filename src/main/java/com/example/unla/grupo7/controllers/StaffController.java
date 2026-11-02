@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.example.unla.grupo7.dtos.PedidoFormDTO;
 import com.example.unla.grupo7.dtos.PedidosDTO;
@@ -24,6 +28,8 @@ import com.example.unla.grupo7.helper.ViewRouteHelper;
 import com.example.unla.grupo7.services.IPedidoService;
 import com.example.unla.grupo7.services.IPlatoService;
 import com.example.unla.grupo7.services.IStaffService;
+import com.example.unla.grupo7.dtos.LiquidacionDTO;
+import com.example.unla.grupo7.services.implementation.ReciboSueldoPdfService;
 
 import jakarta.validation.Valid;
 
@@ -35,11 +41,14 @@ public class StaffController {
     private final IStaffService staffService;
     private final IPlatoService platoService;
     private final IPedidoService pedidoService;
+    private final ReciboSueldoPdfService reciboPdfService;
 
-    public StaffController( IStaffService staffService, IPlatoService platoService, IPedidoService pedidoService){
-        this.staffService= staffService;
-        this.platoService= platoService;
-        this.pedidoService=pedidoService;
+    public StaffController(IStaffService staffService, IPlatoService platoService,IPedidoService pedidoService,ReciboSueldoPdfService reciboPdfService) {
+
+        this.staffService = staffService;
+        this.platoService = platoService;
+        this.pedidoService = pedidoService;
+        this.reciboPdfService = reciboPdfService;
     }
 
 
@@ -117,4 +126,63 @@ public class StaffController {
         mAV.addObject("platos", platoService.listar(username));
         return mAV;
 }
+    // CONSULTAR RECIBO DE SUELDO
+    @GetMapping("/sueldos")
+    public ModelAndView sueldos(Authentication authentication) {
+
+        Staff staff = staffService.buscarPorNombre(authentication.getName());
+
+        if (staff == null || !staff.isActivo()) {
+            throw new IllegalArgumentException(
+                    "No se encontró un empleado activo.");
+        }
+
+        UnidadDeVenta unidad = staff.getUnidadDeVenta();
+
+        if (unidad == null || unidad.getFestival() == null) {
+            throw new IllegalArgumentException(
+                    "No tenés un festival asociado a tu unidad de venta.");
+        }
+
+        Festival festival = unidad.getFestival();
+
+        LiquidacionDTO liquidacion = staffService.liquidarYActualizarSueldo(staff, festival);
+
+        ModelAndView mAV = new ModelAndView("empleado/sueldos");
+
+        mAV.addObject("staff", staff);
+        mAV.addObject("festival", festival);
+        mAV.addObject("liquidacion", liquidacion);
+
+        return mAV;
+    }
+
+
+    // DESCARGAR RECIBO EN PDF
+        @GetMapping("/sueldos/pdf")
+    public ResponseEntity<byte[]> descargarRecibo(Authentication authentication) {
+
+        Staff staff = staffService.buscarPorNombre(authentication.getName());
+
+        if (staff == null || !staff.isActivo()) {
+            throw new IllegalArgumentException(
+                "No se encontró un empleado activo.");
+        }
+
+        UnidadDeVenta unidad = staff.getUnidadDeVenta();
+
+        if (unidad == null || unidad.getFestival() == null) {
+            throw new IllegalArgumentException(
+                "No tenés un festival asociado a tu unidad de venta.");
+        }
+
+        Festival festival = unidad.getFestival();
+
+    LiquidacionDTO liquidacion = staffService.liquidarYActualizarSueldo(staff, festival);
+
+    byte[] pdf = reciboPdfService.generar(staff, festival, liquidacion);
+
+    return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=recibo-sueldo.pdf").contentType(MediaType.APPLICATION_PDF).body(pdf);
+}
+
 }
