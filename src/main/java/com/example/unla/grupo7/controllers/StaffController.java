@@ -16,7 +16,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-
+import com.example.unla.grupo7.dtos.InfoEmpleadoDTO;
+import com.example.unla.grupo7.services.IInfoEmpleadoService;
 import com.example.unla.grupo7.dtos.PedidoFormDTO;
 import com.example.unla.grupo7.dtos.PedidosDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
@@ -42,13 +43,15 @@ public class StaffController {
     private final IPlatoService platoService;
     private final IPedidoService pedidoService;
     private final ReciboSueldoPdfService reciboPdfService;
+    private final IInfoEmpleadoService infoEmpleadoService;
 
-    public StaffController(IStaffService staffService, IPlatoService platoService,IPedidoService pedidoService,ReciboSueldoPdfService reciboPdfService) {
+    public StaffController(IStaffService staffService, IPlatoService platoService,IPedidoService pedidoService,ReciboSueldoPdfService reciboPdfService, IInfoEmpleadoService infoEmpleadoService) {
 
         this.staffService = staffService;
         this.platoService = platoService;
         this.pedidoService = pedidoService;
         this.reciboPdfService = reciboPdfService;
+        this.infoEmpleadoService = infoEmpleadoService;
     }
 
 
@@ -77,6 +80,20 @@ public class StaffController {
         mAV.addObject("festival", festival);
         mAV.addObject("trabajaHoy", trabajaHoy);
         mAV.addObject("hoy", hoy);
+        return mAV;
+    }
+
+    // VER MI INFORMACION: datos del empleado, festivales y unidades en las que trabajó
+    @GetMapping("/mi-informacion")
+    @PreAuthorize("hasRole('EMPLEADO')")
+    public ModelAndView miInformacion(Authentication authentication) {
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.EMPLEADO_INFO);
+        try {
+            InfoEmpleadoDTO info = infoEmpleadoService.obtenerPorUsername(authentication.getName());
+            mAV.addObject("info", info);
+        } catch (IllegalArgumentException e) {
+            mAV.addObject("error", e.getMessage());
+        }
         return mAV;
     }
 
