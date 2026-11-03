@@ -1,6 +1,7 @@
 package com.example.unla.grupo7.services.implementation;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.example.unla.grupo7.dtos.ResumenCajaDTO;
 import com.example.unla.grupo7.entities.Cajero;
 import com.example.unla.grupo7.entities.CierreCaja;
+import com.example.unla.grupo7.entities.Pedido;
 import com.example.unla.grupo7.entities.Staff;
 import com.example.unla.grupo7.entities.UnidadDeVenta;
 import com.example.unla.grupo7.repositories.ICierreCajaRepository;
@@ -58,5 +60,15 @@ public class CierreCajaService implements ICierreCajaService {
         cierre.setTotalVentas(pedidoRepository.totalDelDia(unidad.getIdUnidadDeVenta(), hoy));
 
         return cierreRepository.save(cierre);
+    }
+
+    public List<Pedido> pedidosDelDia(UnidadDeVenta unidad) {
+    return pedidoRepository.findDelDia(unidad.getIdUnidadDeVenta(), LocalDate.now());
+    }
+
+    public CierreCaja cierreDeHoy(UnidadDeVenta unidad) {
+        return cierreRepository
+                .findByUnidadDeVenta_IdUnidadDeVentaAndFecha(unidad.getIdUnidadDeVenta(), LocalDate.now())
+                .orElseThrow(() -> new IllegalArgumentException("La caja de hoy todavía no fue cerrada."));
     }
 }
