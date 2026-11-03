@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -49,5 +50,10 @@ public interface IPedidoRepository extends JpaRepository<Pedido, Long> {
        order by p.idPedido
        """)
         List<Pedido> findDelDia(@Param("unidadId") Long unidadId, @Param("fecha") LocalDate fecha);
+
+        Optional<Pedido> findByIdPedidoAndUnidadDeVenta_IdUnidadDeVenta(
+        Long idPedido,
+        long idUnidadDeVenta
+);
 }
 

@@ -23,8 +23,8 @@
         </a>
 
         <a class="btn"
-           th:if="${esAdmin}"
-           th:href="@{/admin/registrarunidad}">
+            sec:authorize="isAnonymous()"
+            th:href="@{/registrarunidad}">
             Registrar unidad de venta
         </a>
 

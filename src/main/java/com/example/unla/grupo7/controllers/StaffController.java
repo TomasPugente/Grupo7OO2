@@ -158,6 +158,31 @@ public class StaffController {
         return mAV;
     }
 
+    @PostMapping("/pedidos/{id}/entregar")
+public ModelAndView entregarPedido(
+        @org.springframework.web.bind.annotation.PathVariable Long id,
+        Authentication authentication,
+        RedirectAttributes flash) {
+
+    try {
+        pedidoService.entregarPedido(
+                id,
+                authentication.getName()
+        );
+
+        flash.addFlashAttribute(
+                "exito",
+                "El pedido fue entregado correctamente."
+        );
+
+    } catch (IllegalArgumentException e) {
+
+        flash.addFlashAttribute("error", e.getMessage());
+    }
+
+    return new ModelAndView("redirect:/empleado/pedidos");
+}
+
     @GetMapping("/cerrar-caja")
     public ModelAndView cerrarCaja(Authentication authentication) {
         Staff staff = staffService.buscarPorNombre(authentication.getName());

@@ -107,4 +107,29 @@ public class PedidoService implements IPedidoService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.FORBIDDEN, "El usuario no tiene una unidad de venta asignada."));
     }
+
+public void entregarPedido(Long idPedido, String username) {
+
+    UnidadDeVenta unidad = unidadDelUsuario(username);
+
+    Pedido pedido = pedidoRepository
+            .findByIdPedidoAndUnidadDeVenta_IdUnidadDeVenta(
+                    idPedido,
+                    unidad.getIdUnidadDeVenta()
+            )
+            .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "No se encontró el pedido."
+            ));
+
+    if ("ENTREGADO".equalsIgnoreCase(pedido.getEstado())) {
+        throw new IllegalArgumentException(
+                "El pedido ya fue entregado."
+        );
+    }
+
+    pedido.setEstado("ENTREGADO");
+
+    pedidoRepository.save(pedido);
+}
 }
