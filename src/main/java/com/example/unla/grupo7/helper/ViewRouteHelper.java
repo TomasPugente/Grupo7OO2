@@ -26,6 +26,7 @@ public class ViewRouteHelper {
 	public final static String EMPLEADO_DASHBOARD = "empleado/dashboard";
 	public final static String EMPLEADO_PEDIDOS= "empleado/lista-pedidos";
 	public final static String EMPLEADO_NUEVOPEDIDO= "empleado/cargar-pedido";
+	public final static String EMPLEADO_CERRAR_CAJA= "empleado/cerrar-caja";
 	
 
 }
