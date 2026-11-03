@@ -31,6 +31,8 @@ spring:
           starttls:
             enable: true
             required: true
+          ssl:
+            trust: ${MAIL_HOST}
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000

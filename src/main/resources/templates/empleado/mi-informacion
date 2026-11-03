@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mi información')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('empleado')}"></nav>
+<main class="contenedor">
+
+    <h1>Mi información</h1>
+    <p class="subtitulo">Tus datos y los festivales y unidades de venta en las que trabajaste.</p>
+
+    <div class="barra-acciones">
+        <a class="btn secundario" th:href="@{/empleado/dashboard}">Volver al dashboard</a>
+    </div>
+
+    <div class="alerta error" th:if="${error != null}" th:text="${error}"></div>
+
+    <th:block th:if="${info != null}">
+        <div class="panel">
+            <h2>Datos personales</h2>
+            <div class="fila">
+                <div class="dato"><small>Nombre y apellido</small><strong th:text="${info.nombre + ' ' + info.apellido}">—</strong></div>
+                <div class="dato"><small>DNI</small><strong th:text="${info.dni}">—</strong></div>
+                <div class="dato"><small>Email</small><strong th:text="${info.email}">—</strong></div>
+                <div class="dato"><small>Puesto</small><strong th:text="${info.puesto}">—</strong></div>
+                <div class="dato"><small>Fecha de ingreso</small><strong th:text="${info.fechaIngreso}">—</strong></div>
+                <div class="dato"><small>Estado</small><strong th:text="${info.activo} ? 'Activo' : 'Inactivo'">—</strong></div>
+            </div>
+        </div>
+
+        <div class="panel tabla-wrap">
+            <h2>Festivales y unidades de venta</h2>
+            <p th:if="${#lists.isEmpty(info.participaciones)}">Todavía no tenés una unidad de venta asignada.</p>
+            <table th:unless="${#lists.isEmpty(info.participaciones)}">
+                <thead>
+                    <tr>
+                        <th>Festival</th><th>Temporada</th><th>Desde</th><th>Hasta</th><th>Estado</th>
+                        <th>Unidad de venta</th><th>Código</th><th>Tipo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${info.participaciones}">
+                        <td th:text="${p.nombreFestival}">—</td>
+                        <td th:text="${p.temporada}">—</td>
+                        <td th:text="${p.fechaInicio}">—</td>
+                        <td th:text="${p.fechaFin}">—</td>
+                        <td th:text="${p.festivalActivo} ? 'Activo' : 'Finalizado/Inactivo'">—</td>
+                        <td th:text="${p.nombreUnidad}">—</td>
+                        <td th:text="${p.codigoUnidad}">—</td>
+                        <td th:text="${p.tipoUnidad}">—</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+
+</main>
+</body>
+</html>

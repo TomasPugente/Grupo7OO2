@@ -9,12 +9,10 @@
     <p class="subtitulo">Tu información y tu festival actual.</p>
 
     <div class="barra-acciones">
-        <a class="btn" th:href="@{/empleado/mi-informacion}">Mi información</a>
-        <a class="btn" th:href="@{/empleado/pedidos}">Pedidos</a>
+        <a class="btn" th:if="${esCajero}" th:href="@{/empleado/mi-informacion}">Mi información</a>        
+        <a class="btn" th:if="${esCajero}" th:href="@{/empleado/pedidos}">Pedidos</a>
         <a class="btn" th:href="@{/empleado/sueldos}">Mis sueldos</a>
-        <a class="btn" th:href="@{/empleado/festival-actual}">Festival actual</a>
-
-
+        <a class="btn" th:if="${esCajero}" th:href="@{/empleado/cerrar-caja}">Cerrar caja</a>
         <form class="separador" th:action="@{/logout}" method="post">
             <button class="btn secundario" type="submit">Cerrar sesión</button>
         </form>
@@ -43,9 +41,35 @@
     </div>
 
     <div class="fila">
-        <div class="panel"><div class="dato"><small>Rol</small><strong>Cajero</strong></div></div>
-        <div class="panel"><div class="dato"><small>Turno</small><strong>Mañana</strong></div></div>
-        <div class="panel"><div class="dato"><small>Antigüedad</small><strong>2 años</strong></div></div>
+        <div class="panel">
+            <div class="dato">
+                <small>Rol</small>
+                <strong th:text="${esCajero} ? 'Cajero' : 'Cocinero'">Cajero</strong>
+            </div>
+        </div>
+
+        <div class="panel" th:if="${esCajero}">
+            <div class="dato">
+                <small>Turno</small>
+                <strong th:text="${staff.turno}">Mañana</strong>
+            </div>
+        </div>
+
+        <div class="panel" th:if="${esCocinero}">
+            <div class="dato">
+                <small>Especialidad</small>
+                <strong th:text="${staff.especialidad}">Pastelería</strong>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="dato">
+                <small>Antigüedad</small>
+                <strong th:if="${antiguedad == 0}">Menos de 1 año</strong>
+                <strong th:if="${antiguedad == 1}">1 año</strong>
+                <strong th:if="${antiguedad > 1}" th:text="${antiguedad} + ' años'">2 años</strong>
+            </div>
+        </div>
     </div>
 
 </main>

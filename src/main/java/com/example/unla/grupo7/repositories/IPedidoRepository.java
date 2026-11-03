@@ -32,5 +32,22 @@ public interface IPedidoRepository extends JpaRepository<Pedido, Long> {
     @Query("SELECT COUNT(p) FROM Pedido p "
             + "WHERE p.unidadDeVenta.festival.idFestival = :idFestival")
     long contarPedidosPorFestival(@Param("idFestival") long idFestival);
+
+    @Query ("""
+       select coalesce(sum(p.precioTotal), 0) from Pedido p
+       where p.unidadDeVenta.idUnidadDeVenta = :unidadId and p.fechaTransaccion = :fecha
+       """)
+        BigDecimal totalDelDia(@Param("unidadId") Long unidadId, @Param("fecha") LocalDate fecha);
+
+        long countByUnidadDeVenta_IdUnidadDeVentaAndFechaTransaccion(Long unidadId, LocalDate fecha);
+
+        @Query("""
+       select distinct p from Pedido p
+       left join fetch p.detallePedidos d
+       left join fetch d.plato
+       where p.unidadDeVenta.idUnidadDeVenta = :unidadId and p.fechaTransaccion = :fecha
+       order by p.idPedido
+       """)
+        List<Pedido> findDelDia(@Param("unidadId") Long unidadId, @Param("fecha") LocalDate fecha);
 }
 

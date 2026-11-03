@@ -34,18 +34,21 @@ public class RegistroService implements IRegistroService {
     private final IUnidadDeVentaRepository unidadDeVentaRepository;
     private final IFestivalRepository festivalRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
     private final SecureRandom random = new SecureRandom();
 
     public RegistroService(IUserRepository userRepository,
                            IResponsableRepository responsableRepository,
                            IUnidadDeVentaRepository unidadDeVentaRepository,
                            IFestivalRepository festivalRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           EmailService emailService) {
         this.userRepository = userRepository;
         this.responsableRepository = responsableRepository;
         this.unidadDeVentaRepository = unidadDeVentaRepository;
         this.festivalRepository = festivalRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     @Override
@@ -89,6 +92,19 @@ public class RegistroService implements IRegistroService {
         responsable.setUnidadDeVenta(unidad);
         responsable.setUser(user);
         responsableRepository.save(responsable);
+
+        try {
+            emailService.enviarCredenciales(
+                dto.getEmail(),
+                user.getUsername(),
+                passwordEnClaro
+            );
+        } catch (Exception ex) {
+            System.out.println("[RegistroService] No se pudo enviar el mail de credenciales. "
+                + "Causa: " + ex.getMessage()
+                + " | Usuario: " + user.getUsername()
+                + " | Contraseña temporal: " + passwordEnClaro);
+        }
 
         return new CredencialesGeneradasDTO(user.getUsername(), passwordEnClaro, unidad.getNombreComercial());
     }

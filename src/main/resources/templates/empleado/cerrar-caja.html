@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Cerrar caja')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('empleado')}"></nav>
+<main class="contenedor angosto">
+
+    <h1>Cerrar caja</h1>
+    <p class="subtitulo">
+        <span th:text="${unidad.nombreComercial}">Dulce Ruta</span> ·
+        <span th:text="${#temporals.format(resumen.fecha, 'dd/MM/yyyy')}">12/07/2026</span>
+    </p>
+
+    <div class="alerta ok" th:if="${exito}" th:text="${exito}">Caja cerrada correctamente.</div>
+    <div class="alerta error" th:if="${error}" th:text="${error}">Error</div>
+
+    <div class="panel">
+        <div class="dato"><small>Pedidos del día</small><strong th:text="${resumen.cantidadPedidos}">12</strong></div>
+        <div class="dato"><small>Total vendido</small>
+            <strong th:text="'$ ' + ${#numbers.formatDecimal(resumen.total, 1, 'POINT', 2, 'COMMA')}">$ 54.000,00</strong></div>
+
+        <p th:if="${resumen.cerrada}"><span class="etiqueta">Caja cerrada</span></p>
+
+       <form th:unless="${resumen.cerrada}" method="post" th:action="@{/empleado/cerrar-caja}"
+      onsubmit="setTimeout(function(){ window.location.href = '/empleado/cerrar-caja'; }, 1500);">
+    <p class="ayuda">Al cerrar no vas a poder cargar más pedidos hoy.</p>
+    <div class="acciones">
+        <button class="btn" type="submit">Confirmar cierre</button>
+        <a class="btn secundario" th:href="@{/empleado/dashboard}">Cancelar</a>
+    </div>
+</form>
+
+<div class="acciones" th:if="${resumen.cerrada}">
+    <a class="btn" th:href="@{/empleado/cerrar-caja/pdf}">Descargar PDF</a>
+    <a class="btn secundario" th:href="@{/empleado/dashboard}">Volver</a>
+</div>
+    </div>
+
+</main>
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+</body>
+</html>

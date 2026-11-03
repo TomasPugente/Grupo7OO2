@@ -31,6 +31,7 @@ public class RegistroUnidadDTO {
     @Size(min = 3, max = 45)
     private String usuario;
 
+    @NotBlank
     @Email
     private String email;
 

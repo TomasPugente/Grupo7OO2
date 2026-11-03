@@ -1,6 +1,8 @@
 package com.example.unla.grupo7.controllers;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 
 import org.springframework.security.core.Authentication;
@@ -21,17 +23,23 @@ import com.example.unla.grupo7.services.IInfoEmpleadoService;
 import com.example.unla.grupo7.dtos.PedidoFormDTO;
 import com.example.unla.grupo7.dtos.PedidosDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
+import com.example.unla.grupo7.entities.Cajero;
+import com.example.unla.grupo7.entities.CierreCaja;
+import com.example.unla.grupo7.entities.Cocinero;
 import com.example.unla.grupo7.entities.Festival;
 import com.example.unla.grupo7.entities.Pedido;
 import com.example.unla.grupo7.entities.Staff;
 import com.example.unla.grupo7.entities.UnidadDeVenta;
 import com.example.unla.grupo7.helper.ViewRouteHelper;
+import com.example.unla.grupo7.services.ICierreCajaService;
 import com.example.unla.grupo7.services.IPedidoService;
 import com.example.unla.grupo7.services.IPlatoService;
 import com.example.unla.grupo7.services.IStaffService;
 import com.example.unla.grupo7.dtos.LiquidacionDTO;
+import com.example.unla.grupo7.services.implementation.CierreCajaPdfService;
 import com.example.unla.grupo7.services.implementation.ReciboSueldoPdfService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @Controller 
@@ -42,15 +50,17 @@ public class StaffController {
     private final IStaffService staffService;
     private final IPlatoService platoService;
     private final IPedidoService pedidoService;
+    private final ICierreCajaService cierreCajaService;
     private final ReciboSueldoPdfService reciboPdfService;
     private final IInfoEmpleadoService infoEmpleadoService;
-
-    public StaffController(IStaffService staffService, IPlatoService platoService,IPedidoService pedidoService,ReciboSueldoPdfService reciboPdfService, IInfoEmpleadoService infoEmpleadoService) {
-
-        this.staffService = staffService;
-        this.platoService = platoService;
-        this.pedidoService = pedidoService;
+    private final CierreCajaPdfService cierreCajaPdfService;
+    public StaffController( IStaffService staffService, IPlatoService platoService, IPedidoService pedidoService,  ICierreCajaService cierreCajaService, ReciboSueldoPdfService reciboPdfService, CierreCajaPdfService cierreCajaPdfService, IInfoEmpleadoService infoEmpleadoService){
+        this.staffService= staffService;
+        this.platoService= platoService;
+        this.pedidoService=pedidoService;
+        this.cierreCajaService= cierreCajaService;
         this.reciboPdfService = reciboPdfService;
+        this.cierreCajaPdfService= cierreCajaPdfService;
         this.infoEmpleadoService = infoEmpleadoService;
     }
 
@@ -75,7 +85,11 @@ public class StaffController {
                 && !hoy.isBefore(festival.getFechaInicio())
                 && !hoy.isAfter(festival.getFechaFin());
 
+                int anios = Period.between(staff.getFechaIngreso(), LocalDate.now()).getYears();
         mAV.addObject("staff", staff);
+        mAV.addObject("esCajero", staff instanceof Cajero);
+        mAV.addObject("esCocinero", staff instanceof Cocinero);
+        mAV.addObject("antiguedad", anios);
         mAV.addObject("unidad", unidad);
         mAV.addObject("festival", festival);
         mAV.addObject("trabajaHoy", trabajaHoy);
@@ -142,6 +156,55 @@ public class StaffController {
         mAV.addObject("unidad", staff.getUnidadDeVenta());
         mAV.addObject("platos", platoService.listar(username));
         return mAV;
+    }
+
+    @GetMapping("/cerrar-caja")
+    public ModelAndView cerrarCaja(Authentication authentication) {
+        Staff staff = staffService.buscarPorNombre(authentication.getName());
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.EMPLEADO_CERRAR_CAJA);
+        mAV.addObject("unidad", staff.getUnidadDeVenta());
+        mAV.addObject("resumen", cierreCajaService.resumenDelDia(staff.getUnidadDeVenta()));
+        return mAV;
+    }
+
+@PostMapping("/cerrar-caja")
+public ModelAndView confirmarCierre(Authentication authentication,
+                                    HttpServletResponse response,
+                                    RedirectAttributes flash) throws IOException {
+    Staff staff = staffService.buscarPorNombre(authentication.getName());
+    try {
+        CierreCaja cierre = cierreCajaService.cerrar(staff);
+    enviarPdf(response, cierre);        
+    return null; 
+    } catch (IllegalArgumentException e) {
+        flash.addFlashAttribute("error", e.getMessage());
+        return new ModelAndView("redirect:/empleado/cerrar-caja");
+    }
+}
+
+@GetMapping("/cerrar-caja/pdf")
+public ModelAndView descargarPdf(Authentication authentication,
+                                 HttpServletResponse response,
+                                 RedirectAttributes flash) throws IOException {
+    Staff staff = staffService.buscarPorNombre(authentication.getName());
+    try {
+        enviarPdf(response, cierreCajaService.cierreDeHoy(staff.getUnidadDeVenta()));
+        return null;
+    } catch (IllegalArgumentException e) {
+        flash.addFlashAttribute("error", e.getMessage());
+        return new ModelAndView("redirect:/empleado/cerrar-caja");
+    }
+        }
+
+        private void enviarPdf(HttpServletResponse response, CierreCaja cierre) throws IOException {
+    byte[] pdf = cierreCajaPdfService.generar(cierre,
+            cierreCajaService.pedidosDelDia(cierre.getUnidadDeVenta()));
+
+    response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+    response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=\"cierre-caja-" + cierre.getFecha() + ".pdf\"");
+    response.setContentLength(pdf.length);
+    response.getOutputStream().write(pdf);
 }
     // CONSULTAR RECIBO DE SUELDO
     @GetMapping("/sueldos")
@@ -200,6 +263,6 @@ public class StaffController {
     byte[] pdf = reciboPdfService.generar(staff, festival, liquidacion);
 
     return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=recibo-sueldo.pdf").contentType(MediaType.APPLICATION_PDF).body(pdf);
-}
+    }
 
 }
