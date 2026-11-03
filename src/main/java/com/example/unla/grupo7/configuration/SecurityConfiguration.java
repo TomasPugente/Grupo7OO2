@@ -1,4 +1,3 @@
-
 package com.example.unla.grupo7.configuration;
 
 import org.springframework.context.annotation.Bean;
@@ -50,17 +49,22 @@ public class SecurityConfiguration {
                 .requestMatchers(
                     "/",
                     "/login",
+                    "/registrarunidad",
+                    "/registrarunidad/**",
+                    "/exito",
                     "/css/**",
                     "/js/**",
                     "/images/**",
                     "/webjars/**"
                 ).permitAll()
-                
+
                 .requestMatchers(
                     "/festivales/*/unidades",
                     "/festivales/reporte-mayores-canon"
-                ).hasRole("ADMINISTRADOR").requestMatchers("/responsable/platos/**")
-                    .hasAnyRole("RESPONSABLE", "EMPLEADO")
+                ).hasRole("ADMINISTRADOR")
+
+                .requestMatchers("/responsable/platos/**")
+                .hasAnyRole("RESPONSABLE", "EMPLEADO")
 
                 .anyRequest().authenticated()
             )

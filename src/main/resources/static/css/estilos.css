@@ -208,4 +208,207 @@ tr:hover td{background:#fafbfa}
 }
 
 
+/* =====================================
+   LISTADO DE PEDIDOS
+===================================== */
+
+.encabezado-pedidos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.encabezado-pedidos .subtitulo {
+    margin-bottom: 0;
+}
+
+/* Botón cargar pedido */
+
+.btn-cargar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    padding: .7rem 1.2rem;
+    box-shadow: 0 2px 5px rgba(15, 76, 92, .15);
+    transition: background .2s, transform .2s;
+}
+
+.btn-cargar:hover {
+    transform: translateY(-2px);
+}
+
+/* Panel de la tabla */
+
+.panel-pedidos {
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(31, 42, 48, .05);
+}
+
+.tabla-pedidos {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla-pedidos th {
+    background: #eef1ee;
+    color: var(--primario);
+    padding: 1rem;
+    font-size: .88rem;
+    white-space: nowrap;
+}
+
+.tabla-pedidos td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.tabla-pedidos tbody tr {
+    transition: background .2s;
+}
+
+.tabla-pedidos tbody tr:hover {
+    background: #f5f8f6;
+}
+
+.tabla-pedidos tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.fecha-pedido {
+    color: var(--texto-suave);
+    white-space: nowrap;
+}
+
+.precio-pedido {
+    font-weight: 700;
+    color: var(--tinta);
+    white-space: nowrap;
+}
+
+/* Etiquetas de estado */
+
+.estado-pedido {
+    display: inline-block;
+    padding: .35rem .75rem;
+    border-radius: 20px;
+    font-size: .8rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.estado-preparacion {
+    color: #946000;
+    background: #fff3d6;
+    border: 1px solid #f1d89c;
+}
+
+.estado-entregado {
+    color: #23643e;
+    background: #e5f4e9;
+    border: 1px solid #b8ddc2;
+}
+
+/* Botón entregar */
+
+.form-entregar {
+    margin: 0;
+}
+
+.btn-entregar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    background: var(--acento);
+    color: #30230f;
+    border: none;
+    border-radius: 4px;
+    padding: .5rem .85rem;
+    font: inherit;
+    font-size: .85rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .2s, transform .2s;
+}
+
+.btn-entregar:hover {
+    background: #c9892d;
+    transform: translateY(-1px);
+}
+
+.btn-entregar:focus-visible {
+    outline: 2px solid var(--primario);
+    outline-offset: 3px;
+}
+
+/* Pedido finalizado */
+
+.pedido-finalizado {
+    display: inline-block;
+    color: var(--ok);
+    font-size: .85rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* Tabla vacía */
+
+.sin-pedidos {
+    text-align: center !important;
+    padding: 3rem 1rem !important;
+    color: var(--texto-suave);
+}
+
+.sin-pedidos strong,
+.sin-pedidos small {
+    display: block;
+}
+
+.sin-pedidos strong {
+    color: var(--tinta);
+    margin: .5rem 0;
+}
+
+.sin-pedidos small {
+    font-size: .85rem;
+}
+
+.icono-vacio {
+    font-size: 2rem;
+}
+
+/* Responsive */
+
+@media (max-width: 650px) {
+
+    .encabezado-pedidos {
+        align-items: flex-start;
+    }
+
+    .encabezado-pedidos .btn-cargar {
+        width: 100%;
+    }
+
+    .tabla-pedidos {
+        font-size: .85rem;
+    }
+
+    .tabla-pedidos th,
+    .tabla-pedidos td {
+        padding: .7rem .55rem;
+    }
+
+    .btn-entregar {
+        font-size: .78rem;
+        padding: .45rem .6rem;
+    }
+}
+
+
 

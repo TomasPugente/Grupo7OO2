@@ -1,42 +1,97 @@
+
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Pedidos')}"></head>
 <body>
+
 <nav th:replace="~{fragments/layout :: navbar('responsable')}"></nav>
+
 <main class="contenedor">
 
-    <h1>Lista de pedidos</h1>
-    <p class="subtitulo">Pedidos registrados en tu unidad de venta.</p>
+    <div class="encabezado-pedidos">
+        <div>
+            <h1>Lista de pedidos</h1>
+            <p class="subtitulo">
+                Pedidos registrados en tu unidad de venta.
+            </p>
+        </div>
 
-    <div class="barra-acciones">
-        <a class="btn" th:href="@{/empleado/pedidos/nuevo}">Cargar pedido</a>
+        <a class="btn btn-cargar"
+           th:href="@{/empleado/pedidos/nuevo}">
+            + Cargar pedido
+        </a>
     </div>
 
-    <div class="panel tabla-wrap">
-        <table>
+    <p th:if="${exito}" th:text="${exito}" class="alerta ok"></p>
+    <p th:if="${error}" th:text="${error}" class="alerta error"></p>
+
+    <div class="panel tabla-wrap panel-pedidos">
+
+        <table class="tabla-pedidos">
             <thead>
                 <tr>
                     <th>Fecha del pedido</th>
                     <th>Estado del pedido</th>
                     <th class="num">Costo total</th>
+                    <th class="centrado">Acciones</th>
                 </tr>
             </thead>
+
             <tbody>
-                <tr th:each="pedido : ${pedidos}" 
-                th:attr="onclick=|window.location.href='@{/empleado/pedidos/nuevo}'|" 
-                style="cursor:pointer;">
-                    <td th:text="${pedido.fechaTransaccion}"></td>
-                    <td th:text="${pedido.estado}"></td>
-                    <td class="num" th:text="${pedido.precioTotal}"></td>
+                <tr th:each="pedido : ${pedidos}">
+
+                    <td class="fecha-pedido"
+                        th:text="${pedido.fechaTransaccion}">
+                    </td>
+
+                    <td>
+                        <span class="estado-pedido"
+                              th:classappend="${pedido.estado == 'ENTREGADO'} ? ' estado-entregado' : ' estado-preparacion'"
+                              th:text="${pedido.estado}">
+                        </span>
+                    </td>
+
+                    <td class="num precio-pedido"
+                        th:text="${'$ ' + pedido.precioTotal}">
+                    </td>
+
+                    <td class="centrado">
+
+                        <form th:if="${pedido.estado != 'ENTREGADO'}"
+                              th:action="@{/empleado/pedidos/{id}/entregar(id=${pedido.idPedido})}"
+                              method="post"
+                              class="form-entregar">
+
+                            <button type="submit" class="btn btn-entregar">
+                                <span>✓</span> Entregar pedido
+                            </button>
+
+                        </form>
+
+                        <span th:if="${pedido.estado == 'ENTREGADO'}"
+                              class="pedido-finalizado">
+                            ✓ Entregado
+                        </span>
+
+                    </td>
                 </tr>
+
                 <tr th:if="${#lists.isEmpty(pedidos)}">
-                    <td colspan="2">Todavía no hay pedidos cargados.</td>
+                    <td colspan="4" class="sin-pedidos">
+                        <span class="icono-vacio">📋</span>
+                        <strong>No hay pedidos registrados</strong>
+                        <small>Cuando cargues un pedido aparecerá en esta tabla.</small>
+                    </td>
                 </tr>
+
             </tbody>
         </table>
+
     </div>
 
 </main>
+
 <footer th:replace="~{fragments/layout :: pie}"></footer>
+
 </body>
 </html>

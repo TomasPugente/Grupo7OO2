@@ -13,5 +13,5 @@ public interface IPedidoService {
 
     List<Pedido> traerUltimos5Pedidos(String username);
 
-
+    void entregarPedido(Long idPedido, String username);
 }
