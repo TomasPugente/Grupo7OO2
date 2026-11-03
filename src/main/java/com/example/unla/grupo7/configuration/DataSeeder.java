@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.unla.grupo7.entities.Costos;
 import com.example.unla.grupo7.entities.DetallePedido;
 import com.example.unla.grupo7.entities.Festival;
 import com.example.unla.grupo7.entities.Pedido;
@@ -16,6 +17,7 @@ import com.example.unla.grupo7.entities.Plato;
 import com.example.unla.grupo7.entities.UnidadDeVenta;
 import com.example.unla.grupo7.entities.User;
 import com.example.unla.grupo7.entities.UserRole;
+import com.example.unla.grupo7.repositories.ICostosRepository;
 import com.example.unla.grupo7.repositories.IDetallePedidoRepository;
 import com.example.unla.grupo7.repositories.IFestivalRepository;
 import com.example.unla.grupo7.repositories.IPedidoRepository;
@@ -32,6 +34,7 @@ public class DataSeeder implements CommandLineRunner {
     private final IplatoRepository platoRepository;
     private final IPedidoRepository pedidoRepository;
     private final IDetallePedidoRepository detallePedidoRepository;
+    private final ICostosRepository costosRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataSeeder(IUserRepository userRepository,
@@ -40,6 +43,7 @@ public class DataSeeder implements CommandLineRunner {
                       IplatoRepository platoRepository,
                       IPedidoRepository pedidoRepository,
                       IDetallePedidoRepository detallePedidoRepository,
+                      ICostosRepository costosRepository,
                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.festivalRepository = festivalRepository;
@@ -47,6 +51,7 @@ public class DataSeeder implements CommandLineRunner {
         this.platoRepository = platoRepository;
         this.pedidoRepository = pedidoRepository;
         this.detallePedidoRepository = detallePedidoRepository;
+        this.costosRepository = costosRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -55,6 +60,7 @@ public class DataSeeder implements CommandLineRunner {
     public void run(String... args) {
         seedAdmin();
         seedFestivales();
+        seedCostos();
         seedPedidos();
     }
 
@@ -103,6 +109,27 @@ public class DataSeeder implements CommandLineRunner {
         f.setFechaFin(fin);
         f.setActivo(true);
         return f;
+    }
+
+    private void seedCostos() {
+        for (Festival festival : festivalRepository.findAll()) {
+            if (costosRepository.findByFestival_IdFestival(festival.getIdFestival()).isPresent()) {
+                continue;
+            }
+            Costos costos = new Costos();
+            costos.setFestival(festival);
+            costos.setCostoPorSuperficie(new BigDecimal("2000"));
+            costos.setCostoPorMontaje(new BigDecimal("10"));
+            costos.setPlusPorElectricidad(new BigDecimal("500"));
+            costos.setSueldoBase(new BigDecimal("100000"));
+            costos.setMontoAnioAntiguedad(new BigDecimal("5000"));
+            costos.setPlusDeCocinero(new BigDecimal("150000"));
+            costos.setPlusDeCocineroAyudante(new BigDecimal("100000"));
+            costos.setPlusDeLavaPlatos(new BigDecimal("50000"));
+            costosRepository.save(costos);
+            System.out.println("[DataSeeder] Costos creados para el festival '"
+                    + festival.getNombre() + "'.");
+        }
     }
 
     // Siembra 2 pedidos de ejemplo en la primera unidad que tenga platos activos.
