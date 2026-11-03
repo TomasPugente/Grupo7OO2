@@ -1,5 +1,6 @@
 package com.example.unla.grupo7.controllers;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
@@ -22,6 +23,7 @@ import com.example.unla.grupo7.dtos.PedidoFormDTO;
 import com.example.unla.grupo7.dtos.PedidosDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
 import com.example.unla.grupo7.entities.Cajero;
+import com.example.unla.grupo7.entities.CierreCaja;
 import com.example.unla.grupo7.entities.Cocinero;
 import com.example.unla.grupo7.entities.Festival;
 import com.example.unla.grupo7.entities.Pedido;
@@ -33,8 +35,10 @@ import com.example.unla.grupo7.services.IPedidoService;
 import com.example.unla.grupo7.services.IPlatoService;
 import com.example.unla.grupo7.services.IStaffService;
 import com.example.unla.grupo7.dtos.LiquidacionDTO;
+import com.example.unla.grupo7.services.implementation.CierreCajaPdfService;
 import com.example.unla.grupo7.services.implementation.ReciboSueldoPdfService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @Controller 
@@ -47,12 +51,14 @@ public class StaffController {
     private final IPedidoService pedidoService;
     private final ICierreCajaService cierreCajaService;
     private final ReciboSueldoPdfService reciboPdfService;
-    public StaffController( IStaffService staffService, IPlatoService platoService, IPedidoService pedidoService,  ICierreCajaService cierreCajaService, ReciboSueldoPdfService reciboPdfService){
+    private final CierreCajaPdfService cierreCajaPdfService;
+    public StaffController( IStaffService staffService, IPlatoService platoService, IPedidoService pedidoService,  ICierreCajaService cierreCajaService, ReciboSueldoPdfService reciboPdfService, CierreCajaPdfService cierreCajaPdfService){
         this.staffService= staffService;
         this.platoService= platoService;
         this.pedidoService=pedidoService;
         this.cierreCajaService= cierreCajaService;
         this.reciboPdfService = reciboPdfService;
+        this.cierreCajaPdfService= cierreCajaPdfService;
     }
 
 
@@ -144,15 +150,31 @@ public class StaffController {
         return mAV;
     }
 
-    @PostMapping("/cerrar-caja")
-    public ModelAndView confirmarCierre(Authentication authentication, RedirectAttributes flash) {
-        Staff staff = staffService.buscarPorNombre(authentication.getName());
-        try {
-            cierreCajaService.cerrar(staff);
-            flash.addFlashAttribute("exito", "Caja cerrada correctamente.");
-        } catch (IllegalArgumentException e) {
-            flash.addFlashAttribute("error", e.getMessage());
-        }
+@PostMapping("/cerrar-caja")
+public ModelAndView confirmarCierre(Authentication authentication,
+                                    HttpServletResponse response,
+                                    RedirectAttributes flash) throws IOException {
+    Staff staff = staffService.buscarPorNombre(authentication.getName());
+    try {
+        CierreCaja cierre = cierreCajaService.cerrar(staff);
+        enviarPdf(response, cierre);
+        return null;   // la respuesta ya es el PDF, no hay vista que renderizar
+    } catch (IllegalArgumentException e) {
+        flash.addFlashAttribute("error", e.getMessage());
+        return new ModelAndView("redirect:/empleado/cerrar-caja");
+    }
+}
+
+@GetMapping("/cerrar-caja/pdf")
+public ModelAndView descargarPdf(Authentication authentication,
+                                 HttpServletResponse response,
+                                 RedirectAttributes flash) throws IOException {
+    Staff staff = staffService.buscarPorNombre(authentication.getName());
+    try {
+        enviarPdf(response, cierreCajaService.cierreDeHoy(staff.getUnidadDeVenta()));
+        return null;
+    } catch (IllegalArgumentException e) {
+        flash.addFlashAttribute("error", e.getMessage());
         return new ModelAndView("redirect:/empleado/cerrar-caja");
     }
 
@@ -213,6 +235,6 @@ public class StaffController {
     byte[] pdf = reciboPdfService.generar(staff, festival, liquidacion);
 
     return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=recibo-sueldo.pdf").contentType(MediaType.APPLICATION_PDF).body(pdf);
-}
+    }
 
 }
