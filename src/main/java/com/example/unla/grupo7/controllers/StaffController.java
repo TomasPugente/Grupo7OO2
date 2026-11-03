@@ -155,7 +155,7 @@ public class StaffController {
         }
         return new ModelAndView("redirect:/empleado/cerrar-caja");
     }
-}
+
     // CONSULTAR RECIBO DE SUELDO
     @GetMapping("/sueldos")
     public ModelAndView sueldos(Authentication authentication) {
