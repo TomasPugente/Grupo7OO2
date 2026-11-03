@@ -99,9 +99,12 @@ public class ResponsableController {
                 .filter(s -> Hibernate.unproxy(s) instanceof Cajero || Hibernate.unproxy(s) instanceof Cocinero)
                 .map(s -> staffService.liquidarYActualizarSueldo(s, festival))
                 .toList();
+            RentabilidadDTO rentabilidad =
+                    rentabilidadService.calcularPorUnidad(unidad.getIdUnidadDeVenta());
             mAV.addObject("unidad", unidad);
             mAV.addObject("festival", unidad.getFestival());
             mAV.addObject("canon", canon);
+            mAV.addObject("rentabilidad", rentabilidad);
             mAV.addObject("pedidos", pedidos);
             mAV.addObject("pedido", new PedidosDTO());
             mAV.addObject("platoEstrella",

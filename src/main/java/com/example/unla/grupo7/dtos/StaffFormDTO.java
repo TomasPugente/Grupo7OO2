@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Past;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Data;
@@ -27,6 +29,7 @@ public class StaffFormDTO {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @NotNull(message = "Debe ingresar la fecha de nacimiento.")
+    @Past(message = "La fecha de nacimiento debe ser anterior a la fecha actual.")
     private LocalDate fechaNacimiento;
 
     private LocalDate fechaIngreso;
@@ -43,4 +46,13 @@ public class StaffFormDTO {
     private String turno;
 
     private Long unidadDeVentaId;
+
+    @AssertTrue(message = "La persona no es mayor de 18 años.")
+    public boolean isMayorDeEdad() {
+        if (fechaNacimiento == null) {
+            return true;
+        }
+
+        return !fechaNacimiento.isAfter(LocalDate.now().minusYears(18));
+    }
 }

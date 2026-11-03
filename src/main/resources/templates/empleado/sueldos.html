@@ -1,11 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Mi recibo de sueldo')}"></head>
+
 <body>
-  
+
+<nav th:replace="~{fragments/layout :: navbar('empleado')}"></nav>
+
+<main class="contenedor">
+
+    <h1>Mi recibo de sueldo</h1>
+    <p class="subtitulo">
+        Consultá el detalle de tu liquidación de haberes.
+    </p>
+
+    <div class="panel">
+
+        <h2>Datos del empleado</h2>
+
+        <div class="fila">
+            <div class="dato">
+                <small>Nombre y apellido</small>
+                <strong th:text="${staff.nombre + ' ' + staff.apellido}"></strong>
+            </div>
+
+            <div class="dato">
+                <small>DNI</small>
+                <strong th:text="${staff.dni}"></strong>
+            </div>
+
+            <div class="dato">
+                <small>Fecha de ingreso</small>
+                <strong th:text="${staff.fechaIngreso}"></strong>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="panel">
+
+        <h2>Datos del festival</h2>
+
+        <div class="fila">
+            <div class="dato">
+                <small>Festival</small>
+                <strong th:text="${festival.nombre}"></strong>
+            </div>
+
+            <div class="dato">
+                <small>Fecha de inicio</small>
+                <strong th:text="${festival.fechaInicio}"></strong>
+            </div>
+
+            <div class="dato">
+                <small>Fecha de finalización</small>
+                <strong th:text="${festival.fechaFin}"></strong>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="panel">
+
+        <h2>Detalle de la liquidación</h2>
+
+        <div class="fila">
+            <div class="dato">
+                <small>Tipo de empleado</small>
+                <strong th:text="${liquidacion.rol}"></strong>
+            </div>
+
+            <div class="dato">
+                <small>Días del festival</small>
+                <strong th:text="${liquidacion.diasFestival}"></strong>
+            </div>
+
+            <div class="dato">
+                <small>Porcentaje aplicado</small>
+                <strong th:text="${liquidacion.porcentaje + '%'}"></strong>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="fila">
+            <div class="dato">
+                <small>Sueldo base</small>
+                <strong th:text="${#numbers.formatCurrency(liquidacion.sueldoBase)}"></strong>
+            </div>
+
+            <div class="dato">
+                <small>Adicional</small>
+                <strong th:text="${#numbers.formatCurrency(liquidacion.adicional)}"></strong>
+            </div>
+
+            <div class="dato"
+                 th:if="${liquidacion.antiguedadAnios > 0}">
+                <small>Antigüedad</small>
+                <strong th:text="${liquidacion.antiguedadAnios + ' años'}"></strong>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="dato">
+            <small>Total liquidado</small>
+            <h2 th:text="${#numbers.formatCurrency(liquidacion.total)}"></h2>
+        </div>
+
+        <a class="btn"
+           th:href="@{/empleado/sueldos/pdf}">
+            Descargar recibo en PDF
+        </a>
+
+    </div>
+
+    <a class="btn secundario" th:href="@{/empleado/dashboard}">
+        Volver al dashboard
+    </a>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: pie}"></footer>
+
 </body>
 </html>

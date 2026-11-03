@@ -118,7 +118,13 @@ public class StaffService implements IStaffService {
             }
 
             Cocinero cocinero = new Cocinero();
-            cocinero.setEspecialidad(dto.getEspecialidad().trim());
+
+            String especialidad = dto.getEspecialidad().trim();
+
+            cocinero.setEspecialidad(especialidad);
+            cocinero.setPlusPorCategoria(
+                calcularPlusPorCategoria(especialidad)
+            );
 
             staff = cocinero;
 
@@ -209,7 +215,12 @@ public class StaffService implements IStaffService {
                     "Debe indicar la especialidad del cocinero.");
             }
 
-            cocinero.setEspecialidad(dto.getEspecialidad().trim());
+            String especialidad = dto.getEspecialidad().trim();
+
+            cocinero.setEspecialidad(especialidad);
+            cocinero.setPlusPorCategoria(
+                calcularPlusPorCategoria(especialidad)
+            );
         }
 
 
@@ -499,5 +510,24 @@ public class StaffService implements IStaffService {
 
     return liquidacion;
 }
+
+private BigDecimal calcularPlusPorCategoria(String especialidad) {
+
+    if (especialidad == null) {
+        throw new IllegalArgumentException(
+            "Debe seleccionar una especialidad válida."
+        );
+    }
+
+    return switch (especialidad.trim()) {
+        case "Cocinero" -> new BigDecimal("150000");
+        case "Cocinero ayudante" -> new BigDecimal("100000");
+        case "Lavaplatos" -> new BigDecimal("50000");
+        default -> throw new IllegalArgumentException(
+            "La especialidad seleccionada no es válida."
+        );
+    };
+}
+
 
 }
