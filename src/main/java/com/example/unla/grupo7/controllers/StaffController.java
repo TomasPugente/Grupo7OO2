@@ -18,7 +18,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-
+import com.example.unla.grupo7.dtos.InfoEmpleadoDTO;
+import com.example.unla.grupo7.services.IInfoEmpleadoService;
 import com.example.unla.grupo7.dtos.PedidoFormDTO;
 import com.example.unla.grupo7.dtos.PedidosDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
@@ -51,14 +52,16 @@ public class StaffController {
     private final IPedidoService pedidoService;
     private final ICierreCajaService cierreCajaService;
     private final ReciboSueldoPdfService reciboPdfService;
+    private final IInfoEmpleadoService infoEmpleadoService;
     private final CierreCajaPdfService cierreCajaPdfService;
-    public StaffController( IStaffService staffService, IPlatoService platoService, IPedidoService pedidoService,  ICierreCajaService cierreCajaService, ReciboSueldoPdfService reciboPdfService, CierreCajaPdfService cierreCajaPdfService){
+    public StaffController( IStaffService staffService, IPlatoService platoService, IPedidoService pedidoService,  ICierreCajaService cierreCajaService, ReciboSueldoPdfService reciboPdfService, CierreCajaPdfService cierreCajaPdfService, IInfoEmpleadoService infoEmpleadoService){
         this.staffService= staffService;
         this.platoService= platoService;
         this.pedidoService=pedidoService;
         this.cierreCajaService= cierreCajaService;
         this.reciboPdfService = reciboPdfService;
         this.cierreCajaPdfService= cierreCajaPdfService;
+        this.infoEmpleadoService = infoEmpleadoService;
     }
 
 
@@ -91,6 +94,20 @@ public class StaffController {
         mAV.addObject("festival", festival);
         mAV.addObject("trabajaHoy", trabajaHoy);
         mAV.addObject("hoy", hoy);
+        return mAV;
+    }
+
+    // VER MI INFORMACION: datos del empleado, festivales y unidades en las que trabajó
+    @GetMapping("/mi-informacion")
+    @PreAuthorize("hasRole('EMPLEADO')")
+    public ModelAndView miInformacion(Authentication authentication) {
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.EMPLEADO_INFO);
+        try {
+            InfoEmpleadoDTO info = infoEmpleadoService.obtenerPorUsername(authentication.getName());
+            mAV.addObject("info", info);
+        } catch (IllegalArgumentException e) {
+            mAV.addObject("error", e.getMessage());
+        }
         return mAV;
     }
 
@@ -157,8 +174,8 @@ public ModelAndView confirmarCierre(Authentication authentication,
     Staff staff = staffService.buscarPorNombre(authentication.getName());
     try {
         CierreCaja cierre = cierreCajaService.cerrar(staff);
-        enviarPdf(response, cierre);
-        return null;   // la respuesta ya es el PDF, no hay vista que renderizar
+    enviarPdf(response, cierre);        
+    return null; 
     } catch (IllegalArgumentException e) {
         flash.addFlashAttribute("error", e.getMessage());
         return new ModelAndView("redirect:/empleado/cerrar-caja");
@@ -177,7 +194,18 @@ public ModelAndView descargarPdf(Authentication authentication,
         flash.addFlashAttribute("error", e.getMessage());
         return new ModelAndView("redirect:/empleado/cerrar-caja");
     }
+        }
 
+        private void enviarPdf(HttpServletResponse response, CierreCaja cierre) throws IOException {
+    byte[] pdf = cierreCajaPdfService.generar(cierre,
+            cierreCajaService.pedidosDelDia(cierre.getUnidadDeVenta()));
+
+    response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+    response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=\"cierre-caja-" + cierre.getFecha() + ".pdf\"");
+    response.setContentLength(pdf.length);
+    response.getOutputStream().write(pdf);
+}
     // CONSULTAR RECIBO DE SUELDO
     @GetMapping("/sueldos")
     public ModelAndView sueldos(Authentication authentication) {
