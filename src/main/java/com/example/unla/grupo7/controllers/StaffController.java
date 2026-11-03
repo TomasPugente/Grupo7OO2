@@ -177,18 +177,6 @@ public ModelAndView descargarPdf(Authentication authentication,
         flash.addFlashAttribute("error", e.getMessage());
         return new ModelAndView("redirect:/empleado/cerrar-caja");
     }
-}
-
-private void enviarPdf(HttpServletResponse response, CierreCaja cierre) throws IOException {
-    byte[] pdf = cierreCajaPdfService.generar(cierre,
-            cierreCajaService.pedidosDelDia(cierre.getUnidadDeVenta()));
-
-    response.setContentType(MediaType.APPLICATION_PDF_VALUE);
-    response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
-            "attachment; filename=\"cierre-caja-" + cierre.getFecha() + ".pdf\"");
-    response.setContentLength(pdf.length);
-    response.getOutputStream().write(pdf);
-}
 
     // CONSULTAR RECIBO DE SUELDO
     @GetMapping("/sueldos")
