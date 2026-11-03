@@ -18,6 +18,7 @@ import com.example.unla.grupo7.entities.DetallePedido;
 import com.example.unla.grupo7.entities.Pedido;
 import com.example.unla.grupo7.entities.Plato;
 import com.example.unla.grupo7.entities.UnidadDeVenta;
+import com.example.unla.grupo7.repositories.ICierreCajaRepository;
 import com.example.unla.grupo7.repositories.IDetallePedidoRepository;
 import com.example.unla.grupo7.repositories.IPedidoRepository;
 import com.example.unla.grupo7.repositories.IUnidadDeVentaRepository;
@@ -31,12 +32,14 @@ public class PedidoService implements IPedidoService {
     private final IDetallePedidoRepository detalleRepository;
     private final IplatoRepository platoRepository;
     private final IUnidadDeVentaRepository unidadDeVentaRepository;
+    private final ICierreCajaRepository cierreCajaRepository;
 
-    public PedidoService(IPedidoRepository pedidoRepository, IDetallePedidoRepository detallesRepository, IplatoRepository platoRepository, IUnidadDeVentaRepository unidadDeVentaRepository){
+    public PedidoService(IPedidoRepository pedidoRepository, IDetallePedidoRepository detallesRepository, IplatoRepository platoRepository, IUnidadDeVentaRepository unidadDeVentaRepository, ICierreCajaRepository cierreCajaRepository){
         this.pedidoRepository= pedidoRepository;
         this.detalleRepository= detallesRepository;
         this.platoRepository= platoRepository;
         this.unidadDeVentaRepository= unidadDeVentaRepository;
+        this.cierreCajaRepository= cierreCajaRepository;
     }
 
     
@@ -51,7 +54,9 @@ public class PedidoService implements IPedidoService {
     }
 
     public Pedido crear(PedidoFormDTO form, UnidadDeVenta unidad) {
-
+    if (cierreCajaRepository.existsByUnidadDeVenta_IdUnidadDeVentaAndFecha(unidad.getIdUnidadDeVenta(), LocalDate.now())) {
+    throw new IllegalArgumentException("La caja de hoy ya fue cerrada: no se pueden cargar más pedidos.");
+}
         Map<Long, Integer> cantidades = new LinkedHashMap<>();
         for (ItemPedidoDTO item : form.getItems()) {
             if (item.getPlatoId() != null && item.getCantidad() > 0) {

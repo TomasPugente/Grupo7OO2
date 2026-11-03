@@ -1,6 +1,7 @@
 package com.example.unla.grupo7.controllers;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 
 import org.springframework.security.core.Authentication;
@@ -20,11 +21,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import com.example.unla.grupo7.dtos.PedidoFormDTO;
 import com.example.unla.grupo7.dtos.PedidosDTO;
 import com.example.unla.grupo7.dtos.PlatoDTO;
+import com.example.unla.grupo7.entities.Cajero;
+import com.example.unla.grupo7.entities.Cocinero;
 import com.example.unla.grupo7.entities.Festival;
 import com.example.unla.grupo7.entities.Pedido;
 import com.example.unla.grupo7.entities.Staff;
 import com.example.unla.grupo7.entities.UnidadDeVenta;
 import com.example.unla.grupo7.helper.ViewRouteHelper;
+import com.example.unla.grupo7.services.ICierreCajaService;
 import com.example.unla.grupo7.services.IPedidoService;
 import com.example.unla.grupo7.services.IPlatoService;
 import com.example.unla.grupo7.services.IStaffService;
@@ -41,13 +45,13 @@ public class StaffController {
     private final IStaffService staffService;
     private final IPlatoService platoService;
     private final IPedidoService pedidoService;
+    private final ICierreCajaService cierreCajaService;
     private final ReciboSueldoPdfService reciboPdfService;
-
-    public StaffController(IStaffService staffService, IPlatoService platoService,IPedidoService pedidoService,ReciboSueldoPdfService reciboPdfService) {
-
-        this.staffService = staffService;
-        this.platoService = platoService;
-        this.pedidoService = pedidoService;
+    public StaffController( IStaffService staffService, IPlatoService platoService, IPedidoService pedidoService,  ICierreCajaService cierreCajaService, ReciboSueldoPdfService reciboPdfService){
+        this.staffService= staffService;
+        this.platoService= platoService;
+        this.pedidoService=pedidoService;
+        this.cierreCajaService= cierreCajaService;
         this.reciboPdfService = reciboPdfService;
     }
 
@@ -72,7 +76,11 @@ public class StaffController {
                 && !hoy.isBefore(festival.getFechaInicio())
                 && !hoy.isAfter(festival.getFechaFin());
 
+                int anios = Period.between(staff.getFechaIngreso(), LocalDate.now()).getYears();
         mAV.addObject("staff", staff);
+        mAV.addObject("esCajero", staff instanceof Cajero);
+        mAV.addObject("esCocinero", staff instanceof Cocinero);
+        mAV.addObject("antiguedad", anios);
         mAV.addObject("unidad", unidad);
         mAV.addObject("festival", festival);
         mAV.addObject("trabajaHoy", trabajaHoy);
@@ -125,6 +133,28 @@ public class StaffController {
         mAV.addObject("unidad", staff.getUnidadDeVenta());
         mAV.addObject("platos", platoService.listar(username));
         return mAV;
+    }
+
+    @GetMapping("/cerrar-caja")
+    public ModelAndView cerrarCaja(Authentication authentication) {
+        Staff staff = staffService.buscarPorNombre(authentication.getName());
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.EMPLEADO_CERRAR_CAJA);
+        mAV.addObject("unidad", staff.getUnidadDeVenta());
+        mAV.addObject("resumen", cierreCajaService.resumenDelDia(staff.getUnidadDeVenta()));
+        return mAV;
+    }
+
+    @PostMapping("/cerrar-caja")
+    public ModelAndView confirmarCierre(Authentication authentication, RedirectAttributes flash) {
+        Staff staff = staffService.buscarPorNombre(authentication.getName());
+        try {
+            cierreCajaService.cerrar(staff);
+            flash.addFlashAttribute("exito", "Caja cerrada correctamente.");
+        } catch (IllegalArgumentException e) {
+            flash.addFlashAttribute("error", e.getMessage());
+        }
+        return new ModelAndView("redirect:/empleado/cerrar-caja");
+    }
 }
     // CONSULTAR RECIBO DE SUELDO
     @GetMapping("/sueldos")
