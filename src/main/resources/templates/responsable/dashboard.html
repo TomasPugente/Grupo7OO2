@@ -40,7 +40,8 @@
     </div>
                         <a th:href="@{/responsable/canon}" class="btn">Ver detalle</a>
     </div>        
-        <div class="panel"><div class="dato"><small>Rentabilidad neta</small><strong>$ 640.000</strong></div></div>
+        <div class="panel"><div class="dato"><small>Rentabilidad neta</small>
+        <strong th:text="'$ ' + ${#numbers.formatDecimal(rentabilidad.rentabilidadNeta, 1, 'POINT', 2, 'COMMA')}"></strong></div></div>
     </div>
 
     <div class="panel">
