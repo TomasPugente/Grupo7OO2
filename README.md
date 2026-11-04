@@ -6,6 +6,7 @@
 -- 1 responsable y 1 empleado.
 -- Contraseña de los 3 usuarios: 1234
 -- =====================================================================
+
 USE festival_gourmet;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -488,3 +489,31 @@ SELECT (SELECT COUNT(*) FROM festival)                  AS festivales,
 admin@festival.com 1234
 responsable@festival.com 1234
 empleado@festival.com 1234
+
+
+## Casos de Uso del Sistema
+
+| Código | Título | Actor | Descripción | Autor |
+| :---: | :--- | :--- | :--- | :---: |
+| **CU-1** | Visualizar página de inicio | Todos | Vista con información general de los festivales. | **Tomas** |
+| **CU-2** | Registrar unidad de venta con responsable | Administrador | Registrar una unidad de venta junto a su responsable, asignando usuario y contraseña aleatoria. | **Aixa** |
+| **CU-3** | Login | Administrador | Autenticación en el sistema diferenciando roles entre empleado, administrador y responsable mediante usuario y contraseña. | **Tomas** |
+| **CU-4** | Ver festivales | Administrador | Mostrar un listado completo de los festivales disponibles. | **Tomas** |
+| **CU-5** | Ver unidad de venta de un festival | Administrador | Dado un festival seleccionado, mostrar su listado de unidades de venta. | **Tiziano** |
+| **CU-6** | Ranking de unidades | Administrador | Ordenar el listado de unidades de venta de manera descendente según su recaudación. | **Tiziano** |
+| **CU-7** | Unidades con mayor canon | Administrador | Dado un festival, devuelve las "x" unidades (ej. parámetro x=3) que más gastaron en canon (nombre comercial, código, tipo y canon). Utiliza `ReporteMayoresCanonDTO` (no persistente). | **Tiziano** |
+| **CU-8** | ABM de empleados | Responsable | Alta, modificación y baja lógica de empleados. El alta envía un mail con usuario (email) y contraseña aleatoria. Cuenta con método de reactivación para entidades eliminadas. | **Tiziano** |
+| **CU-9** | Gestión de platos | Responsable | Métodos para modificar, agregar y eliminar (lógicamente) platos en el sistema. | **Ian** |
+| **CU-10** | Filtrar empleados por atributos | Responsable | Filtrar empleados por uno o varios atributos, excluyendo a los eliminados lógicamente. | **Tiziano** |
+| **CU-11** | Filtrar platos por atributos | Responsable | Filtrar platos por uno o varios atributos, excluyendo a los eliminados lógicamente. | **Ian** |
+| **CU-12** | Calcular canon de unidad | Responsable | Calcula el monto a pagar según el tipo de unidad:<br>• **Food Truck:** `(areaSup * $500) + $2000` (si requiere conexión eléctrica).<br>• **Puesto:** `(areaSup * $500) - (Tiempo de Montaje * $10)`. | **Tiziano** |
+| **CU-13** | Liquidación de haberes | Responsable | Cálculo de sueldo del personal según tipo y antigüedad:<br>• Sueldo Base: $100.000<br>• Antigüedad: $5.000 por año. | **Tomas** |
+| **CU-14** | Reporte de recaudación | Responsable | Dado un festival, retorna su recaudación total. Utiliza `ReporteVentaDTO` (no persistente). | **Ian** |
+| **CU-15** | Cálculo de rentabilidad neta | Responsable | Calcula la ganancia de una Unidad en un Festival (`Pedidos totales - Costos de platos`), restando obligatoriamente sueldos y canon (pedidos precargados en BD). | **Aixa** |
+| **CU-16** | Cálculo de rentabilidad neta entre 2 fechas | Responsable | Para un Festival y una unidad específicos, calcula la rentabilidad neta entre un rango de fechas. | **Aixa** |
+| **CU-17** | Plato estrella | Responsable | Dado una Unidad y un Festival, devuelve el objeto `PlatoDTO` que registró mayor cantidad de pedidos. | **Aixa** |
+| **CU-18** | Ver información de empleado | Responsable | Consulta los festivales y unidades de venta en los que trabajó un empleado determinado. | **Ian** |
+| **CU-19** | Descargar recibo de sueldo | Empleado | Visualización y descarga del recibo de sueldo en formato PDF. | **Tomas** |
+| **CU-20** | Ver cronograma de trabajo | Empleado | Permite verificar si debe trabajar en un festival activo actualmente y en qué unidad. | **Aixa** |
+| **CU-21** | Cerrar caja al finalizar el día | Empleado (Cajero) | Cierre de caja diario con opción de descarga de reporte en PDF. | **Tomas** |
+| **CU-22** | Cargar pedidos | Empleado | Registro y carga de los pedidos en el sistema. | **Tomas** |
